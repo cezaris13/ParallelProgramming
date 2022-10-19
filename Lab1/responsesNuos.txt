@@ -1,0 +1,45 @@
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.0129061 s.
+Atstumu matricos skaiciavimo laikas: 12.1328 s.
+Sprendinio paieskos laikas: 23.6537 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.00581288 s.
+Atstumu matricos skaiciavimo laikas: 12.159 s.
+Sprendinio paieskos laikas: 22.943 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.00655293 s.
+Atstumu matricos skaiciavimo laikas: 12.287 s.
+Sprendinio paieskos laikas: 22.8164 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.0052352 s.
+Atstumu matricos skaiciavimo laikas: 12.0183 s.
+Sprendinio paieskos laikas: 22.8819 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.00536394 s.
+Atstumu matricos skaiciavimo laikas: 11.9722 s.
+Sprendinio paieskos laikas: 22.8731 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.00534391 s.
+Atstumu matricos skaiciavimo laikas: 12.1695 s.
+Sprendinio paieskos laikas: 23.2679 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.00534606 s.
+Atstumu matricos skaiciavimo laikas: 12.0048 s.
+Sprendinio paieskos laikas: 23.0291 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.005476 s.
+Atstumu matricos skaiciavimo laikas: 12.0958 s.
+Sprendinio paieskos laikas: 23.0055 s.
+geriausia best solution reiksme: 693374
+Geriausias rastas sprendinys (tasku indeksai duomenu masyve): 2561	3357	11597	
+Duomenu ikelimo laikas: 0.00574398 s.
+Atstumu matricos skaiciavimo laikas: 12.0668 s.
+Sprendinio paieskos laikas: 23.0304 s.

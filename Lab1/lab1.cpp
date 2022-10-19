@@ -2,6 +2,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <math.h>
+#include <omp.h>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ double evaluate_solution(int*);                             // Funkcija sprendin
 int main() {
 	
     srand(time(NULL));
+    // srand(1);
 
 	double t_0 = get_time();    // Programos vykdymo pradzios laiko fiksavimas
 		
@@ -54,28 +56,34 @@ int main() {
 	// Geriausio sprendinio pasieska paprastos atsitiktines paieskos algoritmu
     // (angl. Pure Random Search, PRS)
     //-------------------------------------------------------------------------
-	
-    int *solution = new int[num_variables];       // Masyvas atsitiktinai sugeneruotam sprendiniui saugoti
+	omp_set_num_threads(2);
     int *best_solution = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
 	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
-    
+    #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
+    #pragma omp for schedule(dynamic)
     for (int i=0; i<num_iterations; i++) {
+        int *solution = new int[num_variables];       // Masyvas atsitiktinai sugeneruotam sprendiniui saugoti
 		random_solution(solution);                  // Atsitiktinio sprendinio generavimas
 		f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
 		if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
 			f_best_solution = f_solution;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
-			for (int j=0; j<num_variables; j++) {
-                best_solution[j] = solution[j];
+            if(f_best_solution == f_solution){
+                #pragma omp critical (DataCollection)
+                {
+                    for (int j=0; j<num_variables; j++) {
+                        best_solution[j] = solution[j];
+                    }
+                }
             }
 		}
-	}
+    }
 
 	double t_3 = get_time();    // Sprendinio paieskos pabaigos laiko fiksavimas
 
     //-------------------------------------------------------------------------
 	// Rezultatų spausdinimas
     //-------------------------------------------------------------------------
-
+    cout<<"geriausia best solution reiksme: "<<f_best_solution<<endl;
 	cout << "Geriausias rastas sprendinys (tasku indeksai duomenu masyve): ";
 	for (int i=0; i<num_variables; i++) cout << best_solution[i] << "\t";
     cout << endl;
