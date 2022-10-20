@@ -10,7 +10,7 @@ using namespace std;
 
 int num_points = 12000;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 25000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 30000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 double **points;            // Masyvas taskams saugoti
 double **distance_matrix;   // Masyvas atstumu matricai saugoti
@@ -42,7 +42,10 @@ int main() {
     // Matrica yra "trikampe", nes atstumai nuo A iki B ir nuo B iki A yra lygus
     //-------------------------------------------------------------------------
 
+	omp_set_num_threads(4);
 	distance_matrix = new double*[num_points];
+
+	#pragma omp parallel for schedule(guided)
 	for (int i=0; i<num_points; i++) {
 		distance_matrix[i] = new double[i+1];
 		for (int j=0; j<=i; j++) {
@@ -56,7 +59,7 @@ int main() {
 	// Geriausio sprendinio pasieska paprastos atsitiktines paieskos algoritmu
     // (angl. Pure Random Search, PRS)
     //-------------------------------------------------------------------------
-	omp_set_num_threads(2);
+	 
     int *best_solution = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
 	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
     #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
