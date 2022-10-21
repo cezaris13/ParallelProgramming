@@ -130,5 +130,47 @@ pakeisti i pseudo koda
 \end{verbatim}
 \newpage
 \section{Rezultatų analizė}
+\bigskip
+\begin{tikzpicture}
+% draw x , y lines
+\draw[thick,->] (0,0) -- node[below=3ex] {branduolių skaičius} (4,0) ;
+\draw[thick,->] (0,0) -- node[left=3em,rotate=90]  {pagreitejimas} (0,4) ;
+% draw x ,y points (Values)
+\foreach \i [count=\j from 1] in {1,2,3,4}
+{
+   \draw (\j-1,2pt) -- ++ (0,-4pt) node[below] {$\j$};
+   \draw (2pt,\j-1) -- ++ (-4pt,0) node[left]  {$\i$};
+}
+\draw (0,0) -- (3.5,3.5);
+% max teorinis2.9352660935306
+\draw[red] (0,1.93526609) -- (3.5,1.93526609);
+% theoretical graph
+\draw [rounded corners, blue ](0,0) -- (1,0.491775) -- (3, 0.9781); % add coordinates
+% 1.49177515510631
+% 1.97818668769039
+% actual graph
+\draw [rounded corners, red ](0,0) -- (1,0.47144861531196) -- (3, 0.91794196594863); % add coordinates
+\end{tikzpicture}
+
+\begin{tikzpicture}
+% draw x , y lines
+\draw[thick,->] (0,0) -- node[below=3ex] {$x$ axis} (4,0) ;
+\draw[thick,->] (0,0) -- node[left=3em,rotate=90]  {$y$ axis} (0,4) ;
+% draw x ,y points (Values)
+\foreach \i [count=\j from 1] in {1,2,3,4}
+{
+   \draw (\j-1,2pt) -- ++ (0,-4pt) node[below] {$\j$};
+   \draw (2pt,\j-1) -- ++ (-4pt,0) node[left]  {$\i$};
+}
+\draw (0,0) -- (3.5,3.5);
+
+% max teorinis 8249.9255736175
+% theoretical graph
+
+\draw [rounded corners, blue ](0,0) -- (1,0.99975) -- (3, 2.9985459); % add coordinates
+\draw [rounded corners, red ](0,0) -- (1,0.92657401) -- (3, 1.2835); % add coordinates dynamic
+\draw [rounded corners, violet ](0,0) -- (1,0.08614703) -- (3, 0.9202664); % add coordinates static 
+\draw [rounded corners, black](0,0) -- (1,0.2419586) -- (3, 1.31554); % add coordinates guided
+\end{tikzpicture}
 
 \end{document}
