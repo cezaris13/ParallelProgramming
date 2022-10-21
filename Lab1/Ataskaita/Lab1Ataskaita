@@ -1,0 +1,78 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{indentfirst}
+\usepackage{titling}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{matrix,positioning}
+\graphicspath{ {/home/pijus/Documents/Latex/irodymai} }
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}.}
+\renewcommand{\thesubsubsection}{\thesubsection\arabic{subsubsection}.}
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
+
+\hypersetup{
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+%opening
+\title{Lygiagretaus programavimo 1 laboratorinio darbo rezultatų analizė}
+\author{Pijus Petkevičius}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+
+\section{1 laboratorinio darbo aprašymas}
+\subsection{Uždavinys}
+Aibę $A$ sudaro geografiniai taškai, nurodant platumos ir ilgumos koordinates. 
+Iš šios aibės reikia parinkti taškų aibę $X$ tokią, kad atstumų nuo kiekvieno aibės $A$ taško iki jam artimiausio aibės $X$ taško suma būtų minimali $X  \subset A $. 
+
+Faile lab\_data.dat pateikiama 50000 geografinių taškų, kur viena eilutė aprašo vieno geografinio taško koordinates.
+
+Faile lab\_01\_2\_algorithm.cpp pateikiamas programos, kuri randa nurodyto $n$ taškų aibę $X$, atitinkančią uždavinio sąlygą, naudojant paprastosios atsitiktinės paieškos (angl. Pure Random Search, PRS) algoritmą. 
+
+\noindent Pagrindiniai algoritmo parametrai (globalūs kintamieji): 
+\begin{itemize}
+\item num\_points: duomenų aibės $A$ dydis (max 50000)
+\item num\_variables: ieškomos taškų aibės $X$ dydis
+\item num\_iterations: sprendinio paieškai skirtų iteracijų skaičius (kuo daugiau, tuo didesnė tikimybė rasti geresnį sprendinį). 
+\end{itemize}
+
+Algoritmų vykdymo pradžioje sudaroma atstumų matrica, kurioje saugomi atstumai kilometrais tarp taškų, suskaičiuoti pagal Haversino formulę. 
+Atsižvelgiant į tai, kad atstumas nuo taško $a$ iki taško $b$ yra lygus atstumui nuo taško $b$ iki taško $a$, yra užpildoma tik pusė matricos. 
+Šioje matricoje saugomi atstumai yra naudojami vykdant aibės $X$ taškų paiešką.
+\subsection{Laboratorinis darbas 1}
+\begin{enumerate}
+ \item Pasirinkti duomenų aibės dydį ir algoritmo iteracijų skaičių, kad atstumų matricos skaičiavimas užtruktų ne mažiau 10 sekundžių, o sprendinio paieškos laikas būtų nemažesnis nei 20 sekundžių.
+
+\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, o sprendinio paiešką - lygiagretinama dalimi, įvertinti teorinius galimus algoritmo pagreitėjimus naudojant 2 ir 4 procesorius, bei didžiausią galimą pagreitėjimą.
+
+\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, sudarykite lygiagretųjį bendros atminties algoritmą ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius.
+
+\item Sudarykite lygiagretų bendros atminties algoritmą atstumų matricos skaičiavimui ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius.
+
+\item Pananalizuoti, kai matricos reikšmių suskaičiavimą lygiagrečiąja dalimi, o pure random search (PRS), nuosekliąja.
+
+\end{enumerate}
+
+\section{Algortimų analizė}
+
+\subsection{Pure random search (PRS) lygiagretinimas}
+
+\subsection{Atstumų matricos skaičiavimo lygiagretinimas}
+\section{Rezultatų analizė}
+
+
+\end{document}
+
