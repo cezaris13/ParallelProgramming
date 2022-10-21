@@ -54,25 +54,81 @@ Atsižvelgiant į tai, kad atstumas nuo taško $a$ iki taško $b$ yra lygus atst
 Šioje matricoje saugomi atstumai yra naudojami vykdant aibės $X$ taškų paiešką.
 \subsection{Laboratorinis darbas 1}
 \begin{enumerate}
- \item Pasirinkti duomenų aibės dydį ir algoritmo iteracijų skaičių, kad atstumų matricos skaičiavimas užtruktų ne mažiau 10 sekundžių, o sprendinio paieškos laikas būtų nemažesnis nei 20 sekundžių.
+ \item Pasirinkti duomenų aibės dydį ir algoritmo iteracijų skaičių, kad atstumų matricos skaičiavimas užtruktų ne mažiau 10 sekundžių, o sprendinio paieškos laikas būtų nemažesnis nei 20 sekundžių. \label{pirmas nurodymas}
 
-\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, o sprendinio paiešką - lygiagretinama dalimi, įvertinti teorinius galimus algoritmo pagreitėjimus naudojant 2 ir 4 procesorius, bei didžiausią galimą pagreitėjimą.
+\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, o sprendinio paiešką - lygiagretinama dalimi, įvertinti teorinius galimus algoritmo pagreitėjimus naudojant 2 ir 4 procesorius, bei didžiausią galimą pagreitėjimą. \label{antras nurodymas}
 
-\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, sudarykite lygiagretųjį bendros atminties algoritmą ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius.
+\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, sudarykite lygiagretųjį bendros atminties algoritmą ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius. \label{trecias nurodymas}
 
-\item Sudarykite lygiagretų bendros atminties algoritmą atstumų matricos skaičiavimui ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius.
+\item Sudarykite lygiagretų bendros atminties algoritmą atstumų matricos skaičiavimui ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius. \label{ketvirtas nurodymas}
 
-\item Pananalizuoti, kai matricos reikšmių suskaičiavimą lygiagrečiąja dalimi, o pure random search (PRS), nuosekliąja.
+\item Pananalizuoti, kai matricos reikšmių suskaičiavimą lygiagrečiąja dalimi, o pure random search (PRS), nuosekliąja. \label{penktas nurodymas}
 
 \end{enumerate}
+\newpage
+
+\section{Kompiuterinės įrangos ir parametrų pasirinkimas}
+Algoritmo analizei buvo naudojama \textbf{Apple Mac Mini Desktop Computer, 3.2GHz 6-Core Intel Core i7} kompiuteris, kurio dėka, buvo galima paleisti ant 2, 4 ir 6 procesorių.
+Kad įgyvendinti \textbf{\ref{pirmas nurodymas}} nurodymą, buvo pasirinkta:
+\begin{itemize}
+ \item num\_points = 12000
+ \item num\_iterations = 30000
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{| c | c | c |}
+ \hline
+Duomenų nuskaitymas (s) & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s)\\
+ \hline
+0.00323701 & 10.3124 & 19.9546\\
+ \hline
+0.00437999 & 10.3154 & 19.993\\
+ \hline
+0.00339818 & 10.3207 & 19.9673\\
+ \hline
+\end{tabular}
+\end{center}
 
 \section{Algortimų analizė}
-
 \subsection{Pure random search (PRS) lygiagretinimas}
 
+pakeisti i pseudo koda
+\begin{verbatim}
+    int *best_solution = new int[num_variables]; 
+    double f_solution, f_best_solution = 1e10; 
+    #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
+    #pragma omp for schedule(dynamic)
+    for (int i=0; i<num_iterations; i++) {
+        int *solution = new int[num_variables];
+        random_solution(solution);
+        f_solution = evaluate_solution(solution);
+        if (f_solution < f_best_solution) { 
+            (mazesnis) uz geriausia zinoma
+            f_best_solution = f_solution;
+            if(f_best_solution == f_solution){
+                #pragma omp critical (DataCollection)
+                {
+                    for (int j=0; j<num_variables; j++) {
+                        best_solution[j] = solution[j];
+                    }
+                }
+            }
+        }
+    }
+\end{verbatim}
+
 \subsection{Atstumų matricos skaičiavimo lygiagretinimas}
+
+\begin{verbatim}
+    #pragma omp parallel for schedule(dynamic)
+    for (int i=0; i<num_points; i++) {
+        distance_matrix[i] = new double[i+1];
+        for (int j=0; j<=i; j++) {
+            distance_matrix[i][j] = Haversine_distance(points[i][0], points[i][1], points[j][0], points[j][1]);
+        }
+    }
+\end{verbatim}
+\newpage
 \section{Rezultatų analizė}
 
-
 \end{document}
-
