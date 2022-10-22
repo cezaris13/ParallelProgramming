@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 	MPI_Init(&argc, &argv);
     MPI_Comm_size ( MPI_COMM_WORLD , &size );
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-    int proc_count= 2;
+    int proc_count= 4;
     if(rank == 0){
         int arr[10]={0,1,2,3,4,5,6,7,8,9};
         for(int i=0;i<10;i++){
@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
     }
     else{
         do{
+            cout<<"Rank: "<<rank<<endl;
             MPI_Recv(&buff, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
             if(stat.MPI_TAG!=25){
                 int buff1 = buff +1;

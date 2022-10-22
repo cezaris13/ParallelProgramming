@@ -7,4 +7,4 @@ run:
 	# mpic++ 2Task.cpp -o program.o
 	# mpic++ 3Task.cpp -o program.o
 	mpic++ 4Task.cpp -o program.o
-	mpirun -n 2 program.o
+	time mpirun -n 4 program.o
