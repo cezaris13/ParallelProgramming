@@ -134,27 +134,26 @@ pakeisti i pseudo koda
 \section{Rezultatų analizė}
 \bigskip
 PRS lygiagretinimas:\\
-\begin{tikzpicture}[domain=0:3]
+\begin{center}
+\begin{tikzpicture}[domain=0:3, scale=1]
 \begin{axis}[
 xlabel={Branduolių skaičius},
 ylabel={Algoritmo efektyvumas},
 legend style={at={(0.5,-0.17)},anchor=north,legend cell align=left} ]
+\addplot[black, mark=triangle*] table [x=x, y=y,] {
+x y
+1 1
+2 2
+2.3 2.3
+};
 \addplot[blue, mark=circle*,
 nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
 visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 x y label
 1 1 1
-2 1.99975760295228 1.99975760295228
-4 3.99854597016622 3.99854597016622
-6 5.99636580611994  5.99636580611994 
-};
-
-\addplot[black, mark=triangle*] table [x=x, y=y,] {
-x y label 
-1 1 a
-2 2 a
-4 4 a
-6 6 a
+2 1.49177515510631  1.49177515510631
+4 1.97818668769039  1.49177515510631
+6 2.21940844246444  2.21940844246444
 };
 
 \addplot[red, mark=triangle*,
@@ -162,36 +161,36 @@ nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspo
 visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 x y label
 1 1 1
-2 1.91173481098984 1.91173481098984
-4 3.70599235210796 3.70599235210796 
-6 4.44680617366648 4.44680617366648
+2 1.47144861531196 1.47144861531196
+4 1.91794196594863 1.91794196594863
+6 2.11142684438 2.11142684438
 };
-\legend {Teorinis pagreitėjimas,x=y,realus pagreitėjimas}
+\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas}
 \end{axis}
 \end{tikzpicture}
+\end{center}
 
 Matricos skaiciavimo laikai:\\
-\begin{tikzpicture}[domain=0:3]
+\begin{center}
+\begin{tikzpicture}[domain=0:3, scale=1]
 \begin{axis}[
 xlabel={Branduolių skaičius},
 ylabel={Algoritmo efektyvumas},
 legend style={at={(0.5,-0.17)},anchor=north,legend cell align=left} ]
+\addplot[black, mark=triangle*] table [x=x, y=y,] {
+x y
+1 1
+1.4 1.4
+};
+
 \addplot[blue, mark=circle*,
 nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
 visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 x y label
 1 1 1
-2 1.99975760295228 1.99975760295228
-4 3.99854597016622 3.99854597016622
-6 5.99636580611994  5.99636580611994 
-};
-
-\addplot[black, mark=triangle*] table [x=x, y=y,] {
-x y label 
-1 1 a
-2 2 a
-4 4 a
-6 6 a
+2 1.20522833024383 1.20522833024383
+4 1.34304363117962  1.34304363117962
+6 1.39626355564776 1.39626355564776
 };
 
 \addplot[red, mark=triangle*,
@@ -199,18 +198,36 @@ nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspo
 visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 x y label
 1 1 1
-2 1.91173481098984 1.91173481098984
-4 3.70599235210796 3.70599235210796 
-6 4.44680617366648 4.44680617366648
+2 1.17528298304024 1.17528298304024
+4 1.31106750410733 1.31106750410733
+6 1.38428949533786 1.38428949533786
 };
-\legend {Teorinis pagreitėjimas,x=y,realus pagreitėjimas}
+\addplot[orange, mark=triangle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.14934249820694 1.14934249820694
+4 1.27276503291191 1.27276503291191
+6 1.28140219409186 1.28140219409186 
+};
+\addplot[violet, mark=triangle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.06525542297062 1.06525542297062
+4 1.24443394120132 1.24443394120132
+6 1.23684155937314 1.23684155937314
+};
+\legend {x=y,Teorinis pagreitėjimas,dynamic scheduling realus pagreitėjimas,guided realus pagreitėjimas, static realus pagreitėjimas}
 \end{axis}
 \end{tikzpicture}
-
-
+\end{center}
 
 Abu sulygiagrerinti: \\
-\begin{tikzpicture}[domain=0:3]
+\begin{center}
+\begin{tikzpicture}[domain=0:3, scale=1]
 \begin{axis}[
 xlabel={Branduolių skaičius},
 ylabel={Algoritmo efektyvumas},
@@ -226,11 +243,11 @@ x y label
 };
 
 \addplot[black, mark=triangle*] table [x=x, y=y,] {
-x y label 
-1 1 a
-2 2 a
-4 4 a
-6 6 a
+x y
+1 1
+2 2
+4 4
+6 6
 };
 
 \addplot[red, mark=triangle*,
@@ -245,6 +262,8 @@ x y label
 \legend {Teorinis pagreitėjimas,x=y,realus pagreitėjimas}
 \end{axis}
 \end{tikzpicture}
+\end{center}
+
 \newpage
 
 
