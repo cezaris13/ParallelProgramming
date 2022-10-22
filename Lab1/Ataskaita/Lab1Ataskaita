@@ -4,7 +4,7 @@
 \usepackage{graphicx}
 \usepackage[margin=1in]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{tikz}
+\usepackage{tikz,pgfplots}
 \usepackage{indentfirst}
 \usepackage{titling}
 \usepackage[hidelinks]{hyperref}
@@ -15,7 +15,9 @@
 \renewcommand{\thesubsubsection}{\thesubsection\arabic{subsubsection}.}
 \renewcommand\maketitlehooka{\null\mbox{}\vfill}
 \renewcommand\maketitlehookd{\vfill\null}
-
+\pgfplotsset{compat=1.12}
+\tikzset{My Style/.style={/pgf/number format/fixed,
+                  /pgf/number format/precision=3}}
 \hypersetup{
     citecolor=black,
     filecolor=black,
@@ -131,46 +133,119 @@ pakeisti i pseudo koda
 \newpage
 \section{Rezultatų analizė}
 \bigskip
-\begin{tikzpicture}
-% draw x , y lines
-\draw[thick,->] (0,0) -- node[below=3ex] {branduolių skaičius} (4,0) ;
-\draw[thick,->] (0,0) -- node[left=3em,rotate=90]  {pagreitejimas} (0,4) ;
-% draw x ,y points (Values)
-\foreach \i [count=\j from 1] in {1,2,3,4}
-{
-   \draw (\j-1,2pt) -- ++ (0,-4pt) node[below] {$\j$};
-   \draw (2pt,\j-1) -- ++ (-4pt,0) node[left]  {$\i$};
-}
-\draw (0,0) -- (3.5,3.5);
-% max teorinis2.9352660935306
-\draw[red] (0,1.93526609) -- (3.5,1.93526609);
-% theoretical graph
-\draw [rounded corners, blue ](0,0) -- (1,0.491775) -- (3, 0.9781); % add coordinates
-% 1.49177515510631
-% 1.97818668769039
-% actual graph
-\draw [rounded corners, red ](0,0) -- (1,0.47144861531196) -- (3, 0.91794196594863); % add coordinates
+PRS lygiagretinimas:\\
+\begin{tikzpicture}[domain=0:3]
+\begin{axis}[
+xlabel={Branduolių skaičius},
+ylabel={Algoritmo efektyvumas},
+legend style={at={(0.5,-0.17)},anchor=north,legend cell align=left} ]
+\addplot[blue, mark=circle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.99975760295228 1.99975760295228
+4 3.99854597016622 3.99854597016622
+6 5.99636580611994  5.99636580611994 
+};
+
+\addplot[black, mark=triangle*] table [x=x, y=y,] {
+x y label 
+1 1 a
+2 2 a
+4 4 a
+6 6 a
+};
+
+\addplot[red, mark=triangle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.91173481098984 1.91173481098984
+4 3.70599235210796 3.70599235210796 
+6 4.44680617366648 4.44680617366648
+};
+\legend {Teorinis pagreitėjimas,x=y,realus pagreitėjimas}
+\end{axis}
 \end{tikzpicture}
 
-\begin{tikzpicture}
-% draw x , y lines
-\draw[thick,->] (0,0) -- node[below=3ex] {$x$ axis} (4,0) ;
-\draw[thick,->] (0,0) -- node[left=3em,rotate=90]  {$y$ axis} (0,4) ;
-% draw x ,y points (Values)
-\foreach \i [count=\j from 1] in {1,2,3,4}
-{
-   \draw (\j-1,2pt) -- ++ (0,-4pt) node[below] {$\j$};
-   \draw (2pt,\j-1) -- ++ (-4pt,0) node[left]  {$\i$};
-}
-\draw (0,0) -- (3.5,3.5);
+Matricos skaiciavimo laikai:\\
+\begin{tikzpicture}[domain=0:3]
+\begin{axis}[
+xlabel={Branduolių skaičius},
+ylabel={Algoritmo efektyvumas},
+legend style={at={(0.5,-0.17)},anchor=north,legend cell align=left} ]
+\addplot[blue, mark=circle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.99975760295228 1.99975760295228
+4 3.99854597016622 3.99854597016622
+6 5.99636580611994  5.99636580611994 
+};
 
-% max teorinis 8249.9255736175
-% theoretical graph
+\addplot[black, mark=triangle*] table [x=x, y=y,] {
+x y label 
+1 1 a
+2 2 a
+4 4 a
+6 6 a
+};
 
-\draw [rounded corners, blue ](0,0) -- (1,0.99975) -- (3, 2.9985459); % add coordinates
-\draw [rounded corners, red ](0,0) -- (1,0.92657401) -- (3, 1.2835); % add coordinates dynamic
-\draw [rounded corners, violet ](0,0) -- (1,0.08614703) -- (3, 0.9202664); % add coordinates static 
-\draw [rounded corners, black](0,0) -- (1,0.2419586) -- (3, 1.31554); % add coordinates guided
+\addplot[red, mark=triangle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.91173481098984 1.91173481098984
+4 3.70599235210796 3.70599235210796 
+6 4.44680617366648 4.44680617366648
+};
+\legend {Teorinis pagreitėjimas,x=y,realus pagreitėjimas}
+\end{axis}
 \end{tikzpicture}
+
+
+
+Abu sulygiagrerinti: \\
+\begin{tikzpicture}[domain=0:3]
+\begin{axis}[
+xlabel={Branduolių skaičius},
+ylabel={Algoritmo efektyvumas},
+legend style={at={(0.5,-0.17)},anchor=north,legend cell align=left} ]
+\addplot[blue, mark=circle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.99975760295228 1.99975760295228
+4 3.99854597016622 3.99854597016622
+6 5.99636580611994  5.99636580611994 
+};
+
+\addplot[black, mark=triangle*] table [x=x, y=y,] {
+x y label 
+1 1 a
+2 2 a
+4 4 a
+6 6 a
+};
+
+\addplot[red, mark=triangle*,
+nodes near coords*={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+x y label
+1 1 1
+2 1.91173481098984 1.91173481098984
+4 3.70599235210796 3.70599235210796 
+6 4.44680617366648 4.44680617366648
+};
+\legend {Teorinis pagreitėjimas,x=y,realus pagreitėjimas}
+\end{axis}
+\end{tikzpicture}
+\newpage
+
 
 \end{document}
