@@ -9,6 +9,10 @@
 \usepackage{titling}
 \usepackage{siunitx}
 \usepackage[hidelinks]{hyperref}
+\usepackage{newfloat}
+
+\DeclareFloatingEnvironment[fileext=dia]{diagram}
+
 \usetikzlibrary{matrix,positioning}
 \graphicspath{ {/home/pijus/Documents/Latex/irodymai} }
 \renewcommand{\thesection}{\arabic{section}.}
@@ -122,7 +126,8 @@ $$ S_{max} = \lim_{p \rightarrow \infty} \frac {1} {\alpha + \frac {\beta} {p}} 
 \subsection{Pure random search (PRS)}
 
 pakeisti i pseudo koda
-\begin{verbatim}
+\begin{figure}[ht]
+	\begin{verbatim}
     int *best_solution = new int[num_variables]; 
     double f_solution, f_best_solution = 1e10; 
     #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
@@ -145,158 +150,228 @@ pakeisti i pseudo koda
         }
     }
 \end{verbatim}
-PRS lygiagretinimas:\\
-\begin{center}
-	\begin{tikzpicture}[domain=0:3, scale=1]
-		\begin{axis}[
-				xlabel={Branduolių skaičius},
-				ylabel={Algoritmo efektyvumas},
-				legend style={at={(0.5,-0.17)},
-						anchor=north,legend cell align=left} ]
-			%x=y
-			\addplot[black, mark=none] table [x=x, y=y,] {
-					x y
-					1 1
-					2 2
-					2.3 2.3
-				};
-			% Teorinis pagreitejimas
-			\addplot[blue, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.49177515510631  1.49177515510631
-					4 1.97818668769039  1.49177515510631
-					6 2.21940844246444  2.21940844246444
-				};
-			% Realus pagreitejimas
-
-			\addplot [red, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.47144861531196 1.47144861531196
-					4 1.91794196594863 1.91794196594863
-					6 2.11142684438 2.11142684438
-				};
-			\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas}
-		\end{axis}
-	\end{tikzpicture}
-\end{center}
-\newpage
-\subsubsection{Atstumų matricos skaičiavimas}
-
-\begin{verbatim}
-    #pragma omp parallel for schedule(dynamic)
-    for (int i=0; i<num_points; i++) {
-        distance_matrix[i] = new double[i+1];
-        for (int j=0; j<=i; j++) {
-            distance_matrix[i][j] = Haversine_distance(points[i][0], points[i][1], points[j][0], points[j][1]);
+	\caption{PRS pirmas algoritmas}
+	\label {PRS1}
+\end{figure}
+\begin{figure}[ht]
+	\begin{verbatim}
+    double f_best_solution = 1e10;
+    int *best_solution= new int[num_variables]; 
+    #pragma omp parallel reduction(min: f_best_solution) 
+    {
+        int *best_solution_tmp = new int[num_variables];  
+        double f_solution, f_best_solution_tmp = 1e10; 
+        #pragma omp for schedule(dynamic)
+        for (int i=0; i<num_iterations; i++) {
+            int *solution = new int[num_variables];   
+            random_solution(solution);            
+            f_solution = evaluate_solution(solution);
+            if (f_solution < f_best_solution_tmp) {  
+                f_best_solution_tmp = f_solution;  
+                for (int j=0; j<num_variables; j++) {
+                    best_solution_tmp[j] = solution[j];
+                }
+            }
+        }
+        f_best_solution = f_best_solution_tmp;  
+        #pragma omp barrier
+        if(f_best_solution == f_best_solution_tmp){
+            for (int j=0; j<num_variables; j++) {
+                best_solution[j] = best_solution_tmp[j];
+            }
         }
     }
 \end{verbatim}
-Matricos skaiciavimo laikai:\\
-\begin{center}
-	\begin{tikzpicture}[domain=0:3, scale=1]
-		\begin{axis}[
-				xlabel={Branduolių skaičius},
-				ylabel={Algoritmo efektyvumas},
-				legend style={at={(0.5,-0.17)},
-						anchor=north,legend cell align=left} ]
-			\addplot[black, mark=none] table [x=x, y=y,] {
-					x y
-					1 1
-					1.4 1.4
-				};
-			% Teorinis pagreitejimas
-			\addplot[blue, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.20522833024383 1.20522833024383
-					4 1.34304363117962  1.34304363117962
-					6 1.39626355564776 1.39626355564776
-				};
-			%dynamix scheduling
-			\addplot[red, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.17528298304024 1.17528298304024
-					4 1.31106750410733 1.31106750410733
-					6 1.38428949533786 1.38428949533786
-				};
-			%guided scheduling
-			\addplot[orange, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.14934249820694 1.14934249820694
-					4 1.27276503291191 1.27276503291191
-					6 1.28140219409186 1.28140219409186
-				};
-			% static scheduling
-			\addplot[violet, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.06525542297062 1.06525542297062
-					4 1.24443394120132 1.24443394120132
-					6 1.23684155937314 1.23684155937314
-				};
-			\legend {x=y,Teorinis pagreitėjimas,Dynamic realus pagreitėjimas,Guided realus pagreitėjimas, Static realus pagreitėjimas}
-		\end{axis}
-	\end{tikzpicture}
-\end{center}
+	\caption{PRS antras algoritmas}
+	\label {PRS2}
+\end{figure}
+
+PRS lygiagretinimas:\\
+\begin{diagram}[ht]
+	\begin{center}
+		\begin{tikzpicture}[domain=0:3, scale=1]
+			\begin{axis}[
+					xlabel={Branduolių skaičius},
+					ylabel={Algoritmo efektyvumas},
+					legend style={at={(1.5,1)},
+							anchor=north,legend cell align=left} ]
+				%x=y
+				\addplot[black, mark=none] table [x=x, y=y,] {
+						x y
+						1 1
+						2 2
+						2.3 2.3
+					};
+				% Teorinis pagreitejimas
+				\addplot[blue, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.49177515510631  1.49177515510631
+						4 1.97818668769039  1.49177515510631
+						6 2.21940844246444  2.21940844246444
+					};
+				% Realus pagreitejimasold algorithm
+
+				\addplot [red, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.47144861531196 1.47144861531196
+						4 1.91794196594863 1.91794196594863
+						6 2.11142684438 2.11142684438
+					};
+				% Realus pagreitejimasold algorithm
+
+				\addplot [orange, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.45710151139149 1.45710151139149
+						4 1.92298859700795 1.92298859700795
+						6 2.01390336583811 2.01390336583811
+					};
+				\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas(algortimas 1), Realus pagreitejimas(algoritmas 2)}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{PRS algoritmo lygiagretinimo diagrama}
+	\label{dia:PRSdiagrama}
+\end{diagram}
+\newpage
+\subsubsection{Atstumų matricos skaičiavimas}
+
+\begin{figure}[ht]
+	\begin{verbatim}
+    #pragma omp parallel for schedule(dynamic)
+    for (int i=0; i<num_points; i++) {
+        ...
+        for (int j=0; j<=i; j++) {
+            distance_matrix[i][j] = Haversine_distance(...);
+        }
+    }
+\end{verbatim}
+	\caption{Atstumų matricos skaičiavimas}
+	\label {matricos algoritmas}
+\end{figure}
+
+\ref{matricos algoritmas} algoritmas, eksperimentiniu būdu buvo išbandytos įvairios lygiagretinimo strategijos (\textbf{Dynamic},\textbf{Guided},\textbf{ Static}). Gauti rezultatai matomi \ref{dia:diagramaStrategijos} diagramoje:
+
+\begin{diagram}[ht]
+	\begin{center}
+		\begin{tikzpicture}[domain=0:3, scale=1]
+			\begin{axis}[
+					xlabel={Branduolių skaičius},
+					ylabel={Algoritmo efektyvumas},
+					legend style={at={(1.5,1)},
+							anchor=north,legend cell align=left} ]
+				\addplot[black, mark=none] table [x=x, y=y,] {
+						x y
+						1 1
+						1.4 1.4
+					};
+				% Teorinis pagreitejimas
+				\addplot[blue, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.20522833024383 1.20522833024383
+						4 1.34304363117962  1.34304363117962
+						6 1.39626355564776 1.39626355564776
+					};
+				%dynamix scheduling
+				\addplot[red, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.17528298304024 1.17528298304024
+						4 1.31106750410733 1.31106750410733
+						6 1.38428949533786 1.38428949533786
+					};
+				%guided scheduling
+				\addplot[orange, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.14934249820694 1.14934249820694
+						4 1.27276503291191 1.27276503291191
+						6 1.28140219409186 1.28140219409186
+					};
+				% static scheduling
+				\addplot[violet, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.06525542297062 1.06525542297062
+						4 1.24443394120132 1.24443394120132
+						6 1.23684155937314 1.23684155937314
+					};
+				\legend {x=y,Teorinis pagreitėjimas,Dynamic realus pagreitėjimas,Guided realus pagreitėjimas, Static realus pagreitėjimas}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Įvairių strategijų efektyvumo diagrama}
+	\label{dia:diagramaStrategijos}
+\end{diagram}
+
+Pastebime, jog \textbf{Dynamic} yra kur kas efektyvesnis, lyginant su \textbf{Static} lygiagretinimo strategija ir kur kas labiau priartėja prie teorinio pagreitėjimo.
+
+\textbf{Dynamic} direktyvą naudosime tolimesniuose 1 užduoties eksperimentuose.
+
 \newpage
 \subsection{Rezultatų analizė}
 \bigskip
 
 Abu sulygiagrerinti: \\
-\begin{center}
-	\begin{tikzpicture}[domain=0:3, scale=1]
-		\begin{axis}[
-				xlabel={Branduolių skaičius},
-				ylabel={Algoritmo efektyvumas},
-				legend style={at={(0.5,-0.17)},
-						anchor=north,legend cell align=left} ]
-			%x=y
-			\addplot[black, mark=none] table [x=x, y=y,] {
-					x y
-					1 1
-					2 2
-					4 4
-					6 6
-				};
-			%teorinis pagreitėjimas
-			\addplot[blue, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.99975760295228 1.99975760295228
-					4 3.99854597016622 3.99854597016622
-					6 5.99636580611994  5.99636580611994
-				};
-			% realus pagreitėjimas
-			\addplot[red, mark=triangle*,
-				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
-				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
-					x y label
-					1 1 1
-					2 1.91173481098984 1.91173481098984
-					4 3.70599235210796 3.70599235210796
-					6 4.44680617366648 4.44680617366648
-				};
-			\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas}
-		\end{axis}
-	\end{tikzpicture}
-\end{center}
+\begin{diagram}[ht]
+	\begin{center}
+		\begin{tikzpicture}[domain=0:3, scale=1]
+			\begin{axis}[
+					xlabel={Branduolių skaičius},
+					ylabel={Algoritmo efektyvumas},
+					legend style={at={(0.682,0.24)},
+							anchor=north,legend cell align=left} ]
+				%x=y
+				\addplot[black, mark=none] table [x=x, y=y,] {
+						x y
+						1 1
+						2 2
+						4 4
+						6 6
+					};
+				%teorinis pagreitėjimas
+				\addplot[blue, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.99975760295228 1.99975760295228
+						4 3.99854597016622 3.99854597016622
+						6 5.99636580611994  5.99636580611994
+					};
+				% realus pagreitėjimas
+				\addplot[red, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.91173481098984 1.91173481098984
+						4 3.70599235210796 3.70599235210796
+						6 4.44680617366648 4.44680617366648
+					};
+				\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Efektyvumo diagrama, kai PRS ir matricos skaičiavimas lygiagretinami}
+	\label{dia:diagramaLygiagretinimas}
+\end{diagram}
 
 \end{document}
