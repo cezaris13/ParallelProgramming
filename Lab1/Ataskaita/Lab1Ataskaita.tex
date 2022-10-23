@@ -1,0 +1,302 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{tikz,pgfplots}
+\usepackage{indentfirst}
+\usepackage{titling}
+\usepackage{siunitx}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{matrix,positioning}
+\graphicspath{ {/home/pijus/Documents/Latex/irodymai} }
+\renewcommand{\thesection}{\arabic{section}.}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}.}
+\renewcommand{\thesubsubsection}{\thesubsection\arabic{subsubsection}.}
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
+\pgfplotsset{compat=1.12}
+\tikzset{My Style/.style={/pgf/number format/fixed,
+                  /pgf/number format/precision=3}}
+\sisetup{round-mode=places,round-precision=3}
+\hypersetup{
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+%opening
+\title{Lygiagretaus programavimo laboratorinių darbų analizė}
+\author{Pijus Petkevičius}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{1 laboratorinis darbas}
+\subsection{Aprašymas}
+\subsubsection{Įžanga}
+Aibę $A$ sudaro geografiniai taškai, nurodant platumos ir ilgumos koordinates.
+Iš šios aibės reikia parinkti taškų aibę $X$ tokią, kad atstumų nuo kiekvieno aibės $A$ taško iki jam artimiausio aibės $X$ taško suma būtų minimali $X  \subset A $.
+
+Faile lab\_data.dat pateikti 50000 geografinių taškų, kur viena eilutė aprašo vieno geografinio taško koordinates.
+
+Faile lab\_01\_2\_algorithm.cpp pateikta programa, kuri randa nurodyto $n$ taškų aibę $X$, atitinkančią uždavinio sąlygą, naudojant paprastosios atsitiktinės paieškos (angl. Pure Random Search, PRS) algoritmą.
+
+\noindent Pagrindiniai algoritmo parametrai (globalūs kintamieji):
+\begin{itemize}
+	\item num\_points: duomenų aibės $A$ dydis (max 50000)
+	\item num\_variables: ieškomos taškų aibės $X$ dydis
+	\item num\_iterations: sprendinio paieškai skirtų iteracijų skaičius (kuo daugiau, tuo didesnė tikimybė rasti geresnį sprendinį).
+\end{itemize}
+
+Algoritmų vykdymo pradžioje sudaroma atstumų matrica, kurioje saugomi atstumai kilometrais tarp taškų, suskaičiuoti pagal Haversino formulę.
+Atsižvelgiant į tai, kad atstumas nuo taško $a$ iki taško $b$ yra lygus atstumui nuo taško $b$ iki taško $a$, yra užpildoma tik pusė matricos.
+Šioje matricoje saugomi atstumai yra naudojami vykdant aibės $X$ taškų paiešką.
+\subsubsection{Užduotis}
+\begin{enumerate}
+	\item Pasirinkti duomenų aibės dydį ir algoritmo iteracijų skaičių, kad atstumų matricos skaičiavimas užtruktų ne mažiau 10 sekundžių, o sprendinio paieškos laikas būtų nemažesnis nei 20 sekundžių. \label{pirmas nurodymas}
+
+	\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, o sprendinio paiešką - lygiagretinama dalimi, įvertinti teorinius galimus algoritmo pagreitėjimus naudojant 2 ir 4 procesorius, bei didžiausią galimą pagreitėjimą. \label{antras nurodymas}
+
+	\item Duomenų įkėlimą ir atstumų matricos skaičiavimą laikyti nuosekliąja algoritmo dalimi, sudarykite lygiagretųjį bendros atminties algoritmą ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius. \label{trecias nurodymas}
+
+	\item Sudarykite lygiagretų bendros atminties algoritmą atstumų matricos skaičiavimui ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius. \label{ketvirtas nurodymas}
+
+	\item Pananalizuoti, kai matricos reikšmių suskaičiavimą lygiagrečiąja dalimi, o pure random search (PRS), nuosekliąja. \label{penktas nurodymas}
+
+\end{enumerate}
+\newpage
+
+\subsection{Kompiuterinės įrangos ir parametrų pasirinkimas}
+Algoritmo analizei buvo naudojama \textbf{Apple Mac Mini Desktop Computer, 3.2GHz 6-Core Intel Core i7} kompiuteris, kurio dėka, buvo galima paleisti ant 2, 4 ir 6 procesorių.
+Kad įgyvendinti \textbf{\ref{pirmas nurodymas}} nurodymą, buvo pasirinkta:
+\begin{itemize}
+	\item num\_points = 12000
+	\item num\_iterations = 30000
+\end{itemize}
+
+\begin{center}
+	\begin{tabular}{| c | c | c |}
+		\hline
+		Duomenų nuskaitymas (s) & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s) \\
+		\hline
+		\num{0.00323701}        & \num{10.3124}                     & \num{19.9546}        \\
+		\hline
+		\num{0.00437999 }       & \num{10.3154}                     & \num{19.993}         \\
+		\hline
+		\num{0.00339818 }       & \num{10.3207}                     & \num{19.9673}        \\
+		\hline
+	\end{tabular}
+\end{center}
+\subsection{\ref{antras nurodymas} nurodymo teoriniai įverčiai}
+Paleidus programą 3 kartus, gauti skaičiavimo dalių rezultatai:
+\begin{center}
+	\begin{tabular}{| c | c | c |}
+		\hline
+		Duomenų nuskaitymas (s)   & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s)   \\
+		\hline
+		\num{0.00367172666666667} & \num{10.3161666666667}            & \num{19.9716333333333} \\
+		\hline
+	\end{tabular}
+\end{center}
+
+Pagal \ref{antras nurodymas} nurodymą, nuosekliąja dalimi $(\alpha)$ laikoma duomenų nuskaitymas ir atstumų matricos skaičiavimas, o lygiagrečiąja $(\beta)$- PRS skaičiavimas.
+
+$$ \alpha = \frac {\text{nuoseklioji dalis}} {\text{visas laikas}} $$
+$$ \beta = \frac {\text{lygiagrečioji dalis}} {\text{visas laikas}} $$
+
+Gauname kad: $$\alpha = \num{0.340684615341697}$$ $$ \beta = \num{0.659315384658303} $$
+
+Teorinis pagreitėjimas naudojant $p$ procesorių:
+$$S_p = \frac {1} {\alpha + \frac{\beta} {p}} $$
+$$S_2 = \frac {1} { \num{0.340684615341697}+ \frac{\num{0.659315384658303}} {2}}  = \num{1.49177515510631}$$
+$$S_4 = \frac {1} { \num{0.340684615341697} + \frac{\num{0.659315384658303}} {4}}  = \num{1.97818668769039}$$
+
+Teorinis maksimumas pagal Andalo Dėsnį:
+$$ S_{max} = \lim_{p \rightarrow \infty} \frac {1} {\alpha + \frac {\beta} {p}} = \frac {1} {\alpha} = \frac {1} { \num{0.340684615341697}}= \num{2.9352660935306}$$
+\newpage
+\subsection{Pure random search (PRS)}
+
+pakeisti i pseudo koda
+\begin{verbatim}
+    int *best_solution = new int[num_variables]; 
+    double f_solution, f_best_solution = 1e10; 
+    #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
+    #pragma omp for schedule(dynamic)
+    for (int i=0; i<num_iterations; i++) {
+        int *solution = new int[num_variables];
+        random_solution(solution);
+        f_solution = evaluate_solution(solution);
+        if (f_solution < f_best_solution) { 
+            (mazesnis) uz geriausia zinoma
+            f_best_solution = f_solution;
+            if(f_best_solution == f_solution){
+                #pragma omp critical (DataCollection)
+                {
+                    for (int j=0; j<num_variables; j++) {
+                        best_solution[j] = solution[j];
+                    }
+                }
+            }
+        }
+    }
+\end{verbatim}
+PRS lygiagretinimas:\\
+\begin{center}
+	\begin{tikzpicture}[domain=0:3, scale=1]
+		\begin{axis}[
+				xlabel={Branduolių skaičius},
+				ylabel={Algoritmo efektyvumas},
+				legend style={at={(0.5,-0.17)},
+						anchor=north,legend cell align=left} ]
+			%x=y
+			\addplot[black, mark=none] table [x=x, y=y,] {
+					x y
+					1 1
+					2 2
+					2.3 2.3
+				};
+			% Teorinis pagreitejimas
+			\addplot[blue, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.49177515510631  1.49177515510631
+					4 1.97818668769039  1.49177515510631
+					6 2.21940844246444  2.21940844246444
+				};
+			% Realus pagreitejimas
+
+			\addplot [red, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.47144861531196 1.47144861531196
+					4 1.91794196594863 1.91794196594863
+					6 2.11142684438 2.11142684438
+				};
+			\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas}
+		\end{axis}
+	\end{tikzpicture}
+\end{center}
+\newpage
+\subsubsection{Atstumų matricos skaičiavimas}
+
+\begin{verbatim}
+    #pragma omp parallel for schedule(dynamic)
+    for (int i=0; i<num_points; i++) {
+        distance_matrix[i] = new double[i+1];
+        for (int j=0; j<=i; j++) {
+            distance_matrix[i][j] = Haversine_distance(points[i][0], points[i][1], points[j][0], points[j][1]);
+        }
+    }
+\end{verbatim}
+Matricos skaiciavimo laikai:\\
+\begin{center}
+	\begin{tikzpicture}[domain=0:3, scale=1]
+		\begin{axis}[
+				xlabel={Branduolių skaičius},
+				ylabel={Algoritmo efektyvumas},
+				legend style={at={(0.5,-0.17)},
+						anchor=north,legend cell align=left} ]
+			\addplot[black, mark=none] table [x=x, y=y,] {
+					x y
+					1 1
+					1.4 1.4
+				};
+			% Teorinis pagreitejimas
+			\addplot[blue, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.20522833024383 1.20522833024383
+					4 1.34304363117962  1.34304363117962
+					6 1.39626355564776 1.39626355564776
+				};
+			%dynamix scheduling
+			\addplot[red, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.17528298304024 1.17528298304024
+					4 1.31106750410733 1.31106750410733
+					6 1.38428949533786 1.38428949533786
+				};
+			%guided scheduling
+			\addplot[orange, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.14934249820694 1.14934249820694
+					4 1.27276503291191 1.27276503291191
+					6 1.28140219409186 1.28140219409186
+				};
+			% static scheduling
+			\addplot[violet, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.06525542297062 1.06525542297062
+					4 1.24443394120132 1.24443394120132
+					6 1.23684155937314 1.23684155937314
+				};
+			\legend {x=y,Teorinis pagreitėjimas,Dynamic realus pagreitėjimas,Guided realus pagreitėjimas, Static realus pagreitėjimas}
+		\end{axis}
+	\end{tikzpicture}
+\end{center}
+\newpage
+\subsection{Rezultatų analizė}
+\bigskip
+
+Abu sulygiagrerinti: \\
+\begin{center}
+	\begin{tikzpicture}[domain=0:3, scale=1]
+		\begin{axis}[
+				xlabel={Branduolių skaičius},
+				ylabel={Algoritmo efektyvumas},
+				legend style={at={(0.5,-0.17)},
+						anchor=north,legend cell align=left} ]
+			%x=y
+			\addplot[black, mark=none] table [x=x, y=y,] {
+					x y
+					1 1
+					2 2
+					4 4
+					6 6
+				};
+			%teorinis pagreitėjimas
+			\addplot[blue, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.99975760295228 1.99975760295228
+					4 3.99854597016622 3.99854597016622
+					6 5.99636580611994  5.99636580611994
+				};
+			% realus pagreitėjimas
+			\addplot[red, mark=triangle*,
+				nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+				visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+					x y label
+					1 1 1
+					2 1.91173481098984 1.91173481098984
+					4 3.70599235210796 3.70599235210796
+					6 4.44680617366648 4.44680617366648
+				};
+			\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas}
+		\end{axis}
+	\end{tikzpicture}
+\end{center}
+
+\end{document}
