@@ -42,10 +42,10 @@ int main() {
     // Matrica yra "trikampe", nes atstumai nuo A iki B ir nuo B iki A yra lygus
     //-------------------------------------------------------------------------
 
-	omp_set_num_threads(4);
+	omp_set_num_threads(2);
 	distance_matrix = new double*[num_points];
 
-	#pragma omp parallel for schedule(guided)
+	// #pragma omp parallel for schedule(guided)
 	for (int i=0; i<num_points; i++) {
 		distance_matrix[i] = new double[i+1];
 		for (int j=0; j<=i; j++) {
@@ -59,27 +59,53 @@ int main() {
 	// Geriausio sprendinio pasieska paprastos atsitiktines paieskos algoritmu
     // (angl. Pure Random Search, PRS)
     //-------------------------------------------------------------------------
-	 
-    int *best_solution = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
-	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
-    #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
-    #pragma omp for schedule(dynamic)
-    for (int i=0; i<num_iterations; i++) {
-        int *solution = new int[num_variables];       // Masyvas atsitiktinai sugeneruotam sprendiniui saugoti
-		random_solution(solution);                  // Atsitiktinio sprendinio generavimas
-		f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
-		if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
-			f_best_solution = f_solution;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
-            if(f_best_solution == f_solution){
-                #pragma omp critical (DataCollection)
-                {
-                    for (int j=0; j<num_variables; j++) {
-                        best_solution[j] = solution[j];
-                    }
-                }
-            }
+	double f_best_solution = 1e10;
+	int *best_solution= new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
+	#pragma omp parallel reduction(min: f_best_solution) 
+	{
+		int *best_solution_tmp = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
+		double f_solution, f_best_solution_tmp = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
+		#pragma omp for schedule(dynamic)
+		for (int i=0; i<num_iterations; i++) {
+			int *solution = new int[num_variables];       // Masyvas atsitiktinai sugeneruotam sprendiniui saugoti
+			random_solution(solution);                  // Atsitiktinio sprendinio generavimas
+			f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
+			if (f_solution < f_best_solution_tmp) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
+				f_best_solution_tmp = f_solution;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
+				for (int j=0; j<num_variables; j++) {
+					best_solution_tmp[j] = solution[j];
+				}
+			}
 		}
-    }
+		f_best_solution = f_best_solution_tmp;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
+		#pragma omp barrier
+		if(f_best_solution == f_best_solution_tmp){
+			for (int j=0; j<num_variables; j++) {
+				best_solution[j] = best_solution_tmp[j];
+			}
+		}
+	}
+
+	//  int *best_solution = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
+	// double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
+    // #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
+    // #pragma omp for schedule(dynamic)
+    // for (int i=0; i<num_iterations; i++) {
+    //     int *solution = new int[num_variables];       // Masyvas atsitiktinai sugeneruotam sprendiniui saugoti
+	// 	random_solution(solution);                  // Atsitiktinio sprendinio generavimas
+	// 	f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
+	// 	if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
+	// 		f_best_solution = f_solution;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
+    //         if(f_best_solution == f_solution){
+    //             #pragma omp critical (DataCollection)
+    //             {
+    //                 for (int j=0; j<num_variables; j++) {
+    //                     best_solution[j] = solution[j];
+    //                 }
+    //             }
+    //         }
+	// 	}
+    // }
 
 	double t_3 = get_time();    // Sprendinio paieskos pabaigos laiko fiksavimas
 
