@@ -18,6 +18,9 @@
 \renewcommand{\thesection}{\arabic{section}.}
 \renewcommand{\thesubsection}{\thesection\arabic{subsection}.}
 \renewcommand{\thesubsubsection}{\thesubsection\arabic{subsubsection}.}
+\renewcommand{\figurename}{Pseudokodas}
+\renewcommand{\tablename}{Lentelė}
+\renewcommand{\diagramname}{Diagrama}
 \renewcommand\maketitlehooka{\null\mbox{}\vfill}
 \renewcommand\maketitlehookd{\vfill\null}
 \pgfplotsset{compat=1.12}
@@ -70,7 +73,7 @@ Atsižvelgiant į tai, kad atstumas nuo taško $a$ iki taško $b$ yra lygus atst
 
 	\item Sudarykite lygiagretų bendros atminties algoritmą atstumų matricos skaičiavimui ir eksperimentiniu būdu ištirkite jo pagreitėjimą naudodami 2 ir 4 procesorius. \label{ketvirtas nurodymas}
 
-	\item Pananalizuoti, kai matricos reikšmių suskaičiavimą lygiagrečiąja dalimi, o pure random search (PRS), nuosekliąja. \label{penktas nurodymas}
+	\item  Ištirti algoritmo pagreitėjimo priklausomybes nuo procesorių skaičiaus, kai matricos skaičiavimas ir sprendinio paieška išlygiagretinti.\label{penktas nurodymas}
 
 \end{enumerate}
 \newpage
@@ -82,33 +85,38 @@ Kad įgyvendinti \textbf{\ref{pirmas nurodymas}} nurodymą, buvo pasirinkta:
 	\item num\_points = 12000
 	\item num\_iterations = 30000
 \end{itemize}
-
-\begin{center}
-	\begin{tabular}{| c | c | c |}
-		\hline
-		Duomenų nuskaitymas (s) & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s) \\
-		\hline
-		\num{0.00323701}        & \num{10.3124}                     & \num{19.9546}        \\
-		\hline
-		\num{0.00437999 }       & \num{10.3154}                     & \num{19.993}         \\
-		\hline
-		\num{0.00339818 }       & \num{10.3207}                     & \num{19.9673}        \\
-		\hline
-	\end{tabular}
-\end{center}
-\subsection{\ref{antras nurodymas} nurodymo teoriniai įverčiai}
+\begin{table}[ht]
+	\begin{center}
+		\begin{tabular}{| c | c | c |}
+			\hline
+			Duomenų nuskaitymas (s) & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s) \\
+			\hline
+			\num{0.00323701}        & \num{10.3124}                     & \num{19.9546}        \\
+			\hline
+			\num{0.00437999}        & \num{10.3154}                     & \num{19.993}         \\
+			\hline
+			\num{0.00339818}        & \num{10.3207}                     & \num{19.9673}        \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Algoritmo skaičiavimo dalių rezultatai, naudojant \textbf{Mac Mini} kompiuterį}
+\end{table}
+\subsection{Teoriniai įverčiai}
 Paleidus programą 3 kartus, gauti skaičiavimo dalių rezultatai:
-\begin{center}
-	\begin{tabular}{| c | c | c |}
-		\hline
-		Duomenų nuskaitymas (s)   & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s)   \\
-		\hline
-		\num{0.00367172666666667} & \num{10.3161666666667}            & \num{19.9716333333333} \\
-		\hline
-	\end{tabular}
-\end{center}
+\begin{table}[ht]
+	\begin{center}
+		\begin{tabular}{| c | c | c |}
+			\hline
+			Duomenų nuskaitymas (s)   & Atstumų matricos skaičiavimas (s) & PRS skaičiavimas (s)   \\
+			\hline
+			\num{0.00367172666666667} & \num{10.3161666666667}            & \num{19.9716333333333} \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Nuoseklaus algoritmo skačiavimo dalių rezultatai}
+\end{table}
 
-Pagal \ref{antras nurodymas} nurodymą, nuosekliąja dalimi $(\alpha)$ laikoma duomenų nuskaitymas ir atstumų matricos skaičiavimas, o lygiagrečiąja $(\beta)$- PRS skaičiavimas.
+Pagal \textbf{\ref{antras nurodymas}} nurodymą, nuosekliąja dalimi $(\alpha)$ laikoma duomenų nuskaitymas ir atstumų matricos skaičiavimas, o lygiagrečiąja $(\beta)$- PRS skaičiavimas.
 
 $$ \alpha = \frac {\text{nuoseklioji dalis}} {\text{visas laikas}} $$
 $$ \beta = \frac {\text{lygiagrečioji dalis}} {\text{visas laikas}} $$
@@ -124,27 +132,24 @@ Teorinis maksimumas pagal Andalo Dėsnį:
 $$ S_{max} = \lim_{p \rightarrow \infty} \frac {1} {\alpha + \frac {\beta} {p}} = \frac {1} {\alpha} = \frac {1} { \num{0.340684615341697}}= \num{2.9352660935306}$$
 \newpage
 \subsection{Pure random search (PRS)}
+Bandymas išlygiagretinti PRS algoritmą, buvo atliktas 2 būdais.
 
-pakeisti i pseudo koda
+\textbf{\ref{PRS1}} algoritme buvo pasitelkta \textbf{Dynamic} scheduling strategija, ir reduction min: f\_best\_solution. Kievieną karta, kai randamas geresnė sprendinio reikšmė, ji priskiriama f\_best\_solution kintamajam(jis automatiškai pasiima tik mažesnę reikšmę). Vėliau viskas  geriausio sprendinio reikšmės buvo išsaugojamos naudojant critical žymę:
 \begin{figure}[ht]
 	\begin{verbatim}
-    int *best_solution = new int[num_variables]; 
-    double f_solution, f_best_solution = 1e10; 
+    int *best_solution; 
+    double f_solution, f_best_solution; 
     #pragma omp parallel reduction (min: f_best_solution ) private (f_solution)
     #pragma omp for schedule(dynamic)
     for (int i=0; i<num_iterations; i++) {
-        int *solution = new int[num_variables];
-        random_solution(solution);
+        // random find and evaluate solution
         f_solution = evaluate_solution(solution);
         if (f_solution < f_best_solution) { 
-            (mazesnis) uz geriausia zinoma
             f_best_solution = f_solution;
             if(f_best_solution == f_solution){
                 #pragma omp critical (DataCollection)
                 {
-                    for (int j=0; j<num_variables; j++) {
-                        best_solution[j] = solution[j];
-                    }
+                   // copy solution values to the best_solution array
                 }
             }
         }
@@ -153,32 +158,29 @@ pakeisti i pseudo koda
 	\caption{PRS pirmas algoritmas}
 	\label {PRS1}
 \end{figure}
+
+\textbf{\ref{PRS2}} antrajame algoritme veikimo principas gana panašus, tik ciklas paskirstomas keliems branduoliams, randamas lokali geriausia f\_best\_solution\_tmp reikšmė ir po ciklo ji priskiriama f\_best\_solution ir išsaugojamos geriausio sprendinio reikšmės:
 \begin{figure}[ht]
 	\begin{verbatim}
-    double f_best_solution = 1e10;
-    int *best_solution= new int[num_variables]; 
+    double f_best_solution;
+    int *best_solution; 
     #pragma omp parallel reduction(min: f_best_solution) 
     {
-        int *best_solution_tmp = new int[num_variables];  
-        double f_solution, f_best_solution_tmp = 1e10; 
+        int *best_solution_tmp;
+        double f_solution, f_best_solution_tmp;
         #pragma omp for schedule(dynamic)
         for (int i=0; i<num_iterations; i++) {
-            int *solution = new int[num_variables];   
-            random_solution(solution);            
+            // random find and evaluate solution
             f_solution = evaluate_solution(solution);
             if (f_solution < f_best_solution_tmp) {  
                 f_best_solution_tmp = f_solution;  
-                for (int j=0; j<num_variables; j++) {
-                    best_solution_tmp[j] = solution[j];
-                }
+               // copy solution values to the best_solution_tmp array
             }
         }
         f_best_solution = f_best_solution_tmp;  
         #pragma omp barrier
         if(f_best_solution == f_best_solution_tmp){
-            for (int j=0; j<num_variables; j++) {
-                best_solution[j] = best_solution_tmp[j];
-            }
+            // copy best_solution_tmp values to the best_solution array
         }
     }
 \end{verbatim}
@@ -186,7 +188,10 @@ pakeisti i pseudo koda
 	\label {PRS2}
 \end{figure}
 
-PRS lygiagretinimas:\\
+\newpage
+
+Abu algoritmai buvo ištestuoti su 2, 4 ir 6 branduoliais ir rezultatai matomi \textbf{\ref{dia:PRSdiagrama}} diagramoje:
+
 \begin{diagram}[ht]
 	\begin{center}
 		\begin{tikzpicture}[domain=0:3, scale=1]
@@ -241,8 +246,28 @@ PRS lygiagretinimas:\\
 	\caption{PRS algoritmo lygiagretinimo diagrama}
 	\label{dia:PRSdiagrama}
 \end{diagram}
+
+Pastebime, kad \textbf{\ref{PRS1}} ir \textbf{\ref{PRS2}} algoritmai su 2 ir 4 branduoliais turėjo ganėtinai panašų efektyvumą:
+\begin{table}[ht]
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Branduolių skaicius & 1 algoritmas           & 2 algoritmas            \\
+			\hline
+			2                   & \num{1.47144861531196} & \num{1.45710151139149}  \\
+			\hline
+			4                   & \num{1.91794196594863} & \num{1.922298859700795} \\
+			\hline
+			6                   & \num{2.11142684438}    & \num{2.01390336583811}  \\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Algoritmų efektuvumo priklausomybė nuo branduolių skaičiaus}
+\end{table}
+
+Tačiau, kai branduolių skaičius pasiekia 6, \ref{PRS2}-sis algoritmas nusileidžia efektyvumu \ref{PRS1}-jam. \\ \textbf{\ref{PRS1}-jį} algoritmą naudosime tolimesniuose 1 užduoties eksperimentuose.
 \newpage
-\subsubsection{Atstumų matricos skaičiavimas}
+\subsection{Atstumų matricos skaičiavimas}
 
 \begin{figure}[ht]
 	\begin{verbatim}
@@ -258,7 +283,7 @@ PRS lygiagretinimas:\\
 	\label {matricos algoritmas}
 \end{figure}
 
-\ref{matricos algoritmas} algoritmas, eksperimentiniu būdu buvo išbandytos įvairios lygiagretinimo strategijos (\textbf{Dynamic},\textbf{Guided},\textbf{ Static}). Gauti rezultatai matomi \ref{dia:diagramaStrategijos} diagramoje:
+\textbf{\ref{matricos algoritmas}} algoritmas, eksperimentiniu būdu buvo išbandytos įvairios lygiagretinimo strategijos (\textbf{Dynamic},\textbf{Guided},\textbf{ Static}). Gauti rezultatai matomi \textbf{\ref{dia:diagramaStrategijos}} diagramoje:
 
 \begin{diagram}[ht]
 	\begin{center}
@@ -321,15 +346,14 @@ PRS lygiagretinimas:\\
 	\label{dia:diagramaStrategijos}
 \end{diagram}
 
-Pastebime, jog \textbf{Dynamic} yra kur kas efektyvesnis, lyginant su \textbf{Static} lygiagretinimo strategija ir kur kas labiau priartėja prie teorinio pagreitėjimo.
+Pastebime, jog \textbf{Dynamic} yra kur kas efektyvesnis, lyginant su \textbf{Static} ir \textbf{Guided} lygiagretinimo strategijomis ir kur kas labiau priartėja prie teorinio pagreitėjimo.
 
 \textbf{Dynamic} direktyvą naudosime tolimesniuose 1 užduoties eksperimentuose.
 
 \newpage
-\subsection{Rezultatų analizė}
-\bigskip
-
-Abu sulygiagrerinti: \\
+\subsection{Atstumų matricos ir PRS dalių lygiagretinimo rezultatai}
+Iš ankstesnių eksperimentų radome, jog \textbf{\ref{PRS1}} PRS algoritmas ir \textbf{Dynamic} direktyva atstumų matricai skaičiuoti buvo efektyviausi sprendimo būdai. 
+Eksperimentiniu būdu ištestavus progamą, buvo gauti tokie rezultatai:
 \begin{diagram}[ht]
 	\begin{center}
 		\begin{tikzpicture}[domain=0:3, scale=1]
