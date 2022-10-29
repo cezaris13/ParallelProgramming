@@ -28,9 +28,10 @@ int main(int argc, char *argv[]) {
     int chunkSize = N /numProcs;
     int *B = new int[N];
 
+    // scatter array to cores
     MPI_Scatter(A, chunkSize, MPI_INT, B, chunkSize, MPI_INT, 0, MPI_COMM_WORLD);
     int sum = 0;
-
+    // count sum and print numbers
     for (int i=0; i<numProcs; i++) {
         if (id == i) {
             printf("Proc %d: ", id);
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
         MPI_Barrier(MPI_COMM_WORLD);
     }
     int *Response = new int[numProcs];
-
+    // Gather all sums to one array
     MPI_Gather(&sum, 1, MPI_INT, Response, 1, MPI_INT, 0, MPI_COMM_WORLD);
     if(id == 0){
         printf("After:\n");
@@ -58,6 +59,7 @@ int main(int argc, char *argv[]) {
     //broadcast part
 
     MPI_Bcast(A, N, MPI_INT, 0, MPI_COMM_WORLD);
+    // calculate closest value to the id
     int mindiff=10e7;
     int minVal=-1;
     for(int i=0;i<N;i++){
