@@ -8,9 +8,9 @@ using namespace std;
 
 //===== Globalus kintamieji ===================================================
 
-int num_points = 12;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
+int num_points = 12000;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 30;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 30000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 double **points;            // Masyvas taskams saugoti
 double **distance_matrix;   // Masyvas atstumu matricai saugoti
