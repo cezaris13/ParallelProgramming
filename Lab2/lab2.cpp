@@ -10,7 +10,7 @@ using namespace std;
 
 int num_points = 20;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 3000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 100;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 double **points;            // Masyvas taskams saugoti
 double **distance_matrix;   // Masyvas atstumu matricai saugoti
@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
                 MPI_Send(localDistances, buff + 1, MPI_DOUBLE, 0, stat.MPI_TAG, MPI_COMM_WORLD);
             }
         } while(stat.MPI_TAG!=25);
+
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
@@ -92,9 +93,9 @@ int main(int argc, char *argv[]) {
     //         printf("%d %f, ", world_rank, distance_matrix[i][j]);
     //     }
     //     printf("\n");
-    //     distance_matrix[i] = new double[i+1];
     // }
 
+            printf("hlp");
 	double t_2 = get_time();    // Matricos skaiciavimo pabaigos laiko fiksavimas
 
     //-------------------------------------------------------------------------
@@ -106,16 +107,60 @@ int main(int argc, char *argv[]) {
     int *best_solution = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
 	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
 
-    for (int i=0; i<num_iterations; i++) {
-		random_solution(solution);                  // Atsitiktinio sprendinio generavimas
-		f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
-		if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
-			f_best_solution = f_solution;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
-			for (int j=0; j<num_variables; j++) {
-                best_solution[j] = solution[j];
+    if(world_rank == 0){
+        for (int i=0; i<num_iterations; i=i+(world_size-1)) {
+            printf("hlp");
+            for(int j=1;j<world_size;j++){
+                MPI_Send(&buff, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
             }
-		}
-	}
+
+            for(int j=1;j<world_size;j++){
+                MPI_Recv(distance_matrix[i+j-1], i+1, MPI_DOUBLE, j, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+            }
+        }
+        for(int j=1;j<world_size;j++){
+            MPI_Send(&buff, 1, MPI_INT, j, 12, MPI_COMM_WORLD);
+        }
+        int rankId = -1;
+        for(int j=1;j<world_size;j++){
+            double response;
+            MPI_Recv(&response, 1, MPI_DOUBLE, j, 12, MPI_COMM_WORLD, &stat);
+            if(response < f_best_solution) {
+                rankId = j;
+            }
+        }
+
+        MPI_Send(&buff, 1, MPI_INT, rankId, 30, MPI_COMM_WORLD);
+        MPI_Recv(best_solution, num_variables, MPI_DOUBLE, rankId, 12, MPI_COMM_WORLD, &stat);
+
+        for(int j=1;j<world_size;j++){
+            MPI_Send(&buff, 1, MPI_INT, j, 25, MPI_COMM_WORLD);
+        }
+    }
+    else {
+        do{
+            MPI_Recv(&buff, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
+            if(stat.MPI_TAG!=25){
+                if(stat.MPI_TAG == 0){
+                    random_solution(solution);                  // Atsitiktinio sprendinio generavimas
+                    f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
+                    if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
+                        f_best_solution = f_solution;            // Jei taip, atnaujinam informacija apie geriausia zinoma sprendini
+                        for (int j=0; j<num_variables; j++) {
+                            best_solution[j] = solution[j];
+                        }
+                    }
+                }
+                if(stat.MPI_TAG == 12) {
+                    MPI_Send(&f_best_solution, 1, MPI_DOUBLE, 0, stat.MPI_TAG, MPI_COMM_WORLD);
+                }
+                if(stat.MPI_TAG == 30){
+                    MPI_Send(best_solution, num_variables, MPI_INT, 0, stat.MPI_TAG, MPI_COMM_WORLD);
+                }
+
+            }
+        } while(stat.MPI_TAG!=25);
+    }
 
 	double t_3 = get_time();    // Sprendinio paieskos pabaigos laiko fiksavimas
 
