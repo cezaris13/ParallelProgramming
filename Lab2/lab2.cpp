@@ -8,9 +8,9 @@ using namespace std;
 
 //===== Globalus kintamieji ===================================================
 
-int num_points = 20;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
+int num_points = 1;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 100;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 1;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 double **points;            // Masyvas taskams saugoti
 double **distance_matrix;   // Masyvas atstumu matricai saugoti
@@ -88,14 +88,14 @@ int main(int argc, char *argv[]) {
         MPI_Bcast(distance_matrix[i],i+1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     }
 
-    // for(int i=0;i<num_points;i++){
-    //     for(int j= 0; j<=i;j++){
-    //         printf("%d %f, ", world_rank, distance_matrix[i][j]);
-    //     }
-    //     printf("\n");
-    // }
+    for(int i=0;i<num_points;i++){
+        for(int j= 0; j<=i;j++){
+            printf("%d %f, ", world_rank, distance_matrix[i][j]);
+        }
+        printf("\n");
+    }
 
-            printf("hlp");
+    printf("hlp");
 	double t_2 = get_time();    // Matricos skaiciavimo pabaigos laiko fiksavimas
 
     //-------------------------------------------------------------------------
@@ -107,15 +107,17 @@ int main(int argc, char *argv[]) {
     int *best_solution = new int[num_variables];  // Masyvas geriausiam rastam sprendiniui saugoti
 	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
+            printf("hlp");
     if(world_rank == 0){
         for (int i=0; i<num_iterations; i=i+(world_size-1)) {
-            printf("hlp");
             for(int j=1;j<world_size;j++){
                 MPI_Send(&buff, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
             }
 
             for(int j=1;j<world_size;j++){
-                MPI_Recv(distance_matrix[i+j-1], i+1, MPI_DOUBLE, j, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+                MPI_Recv(&buff, i+1, MPI_INT, j, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
             }
         }
         for(int j=1;j<world_size;j++){
@@ -150,6 +152,7 @@ int main(int argc, char *argv[]) {
                             best_solution[j] = solution[j];
                         }
                     }
+                    MPI_Send(&buff, 1, MPI_INT, 0, stat.MPI_TAG, MPI_COMM_WORLD);
                 }
                 if(stat.MPI_TAG == 12) {
                     MPI_Send(&f_best_solution, 1, MPI_DOUBLE, 0, stat.MPI_TAG, MPI_COMM_WORLD);
