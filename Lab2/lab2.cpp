@@ -8,9 +8,9 @@ using namespace std;
 
 //===== Globalus kintamieji ===================================================
 
-int num_points = 1;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
+int num_points = 12;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 1;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 30;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 double **points;            // Masyvas taskams saugoti
 double **distance_matrix;   // Masyvas atstumu matricai saugoti
@@ -27,16 +27,14 @@ double evaluate_solution(int*);                             // Funkcija sprendin
 //=============================================================================
 
 int main(int argc, char *argv[]) {
-    MPI_Init(&argc, &argv);
-
-    // Procesoriaus rangas pagrindiniame komunikatoriuje
     int world_rank, world_size;
     int buff;
     MPI_Status stat;
+    srand(time(NULL));
+
+    MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-
-    srand(time(NULL));
 
 	double t_0 = get_time();    // Programos vykdymo pradzios laiko fiksavimas
 
@@ -84,6 +82,7 @@ int main(int argc, char *argv[]) {
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
+
     for(int i =0;i<num_points;i++){
         MPI_Bcast(distance_matrix[i],i+1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     }
@@ -95,8 +94,7 @@ int main(int argc, char *argv[]) {
         printf("\n");
     }
 
-    printf("hlp");
-	double t_2 = get_time();    // Matricos skaiciavimo pabaigos laiko fiksavimas
+	double t_2 = get_time();
 
     //-------------------------------------------------------------------------
 	// Geriausio sprendinio pasieska paprastos atsitiktines paieskos algoritmu
@@ -109,7 +107,6 @@ int main(int argc, char *argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-            printf("hlp");
     if(world_rank == 0){
         for (int i=0; i<num_iterations; i=i+(world_size-1)) {
             for(int j=1;j<world_size;j++){
@@ -129,11 +126,12 @@ int main(int argc, char *argv[]) {
             MPI_Recv(&response, 1, MPI_DOUBLE, j, 12, MPI_COMM_WORLD, &stat);
             if(response < f_best_solution) {
                 rankId = j;
+                f_best_solution = response;
             }
         }
 
         MPI_Send(&buff, 1, MPI_INT, rankId, 30, MPI_COMM_WORLD);
-        MPI_Recv(best_solution, num_variables, MPI_DOUBLE, rankId, 12, MPI_COMM_WORLD, &stat);
+        MPI_Recv(best_solution, num_variables, MPI_DOUBLE, rankId, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
 
         for(int j=1;j<world_size;j++){
             MPI_Send(&buff, 1, MPI_INT, j, 25, MPI_COMM_WORLD);
