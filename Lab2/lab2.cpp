@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
 
 	double t_3 = get_time();    // Sprendinio paieskos pabaigos laiko fiksavimas
 
-    // if( world_rank == 0 ){
+    if( world_rank == 0 ){
         cout<<"geriausia best solution reiksme: "<<f_best_solution<<endl;
         cout << "Geriausias rastas sprendinys (tasku indeksai duomenu masyve): ";
         for (int i=0; i<num_variables; i++) cout << best_solution[i] << "\t";
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
         cout << "Duomenu ikelimo laikas: " << t_1 - t_0 << " s." << endl;
         cout << "Atstumu matricos skaiciavimo laikas: " << t_2 - t_1 << " s." << endl;
         cout << "Sprendinio paieskos laikas: " << t_3 - t_2 << " s." << endl;
-    // }
+    }
 
     MPI_Finalize();
 }
