@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
             }
 
             for(int j=1;j<world_size;j++){
-                MPI_Recv(distance_matrix[i+j-1], i+1, MPI_DOUBLE, j, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+                MPI_Recv(distance_matrix[i+j-1], i+1, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
             }
         }
         for(int j=1;j<world_size;j++){
