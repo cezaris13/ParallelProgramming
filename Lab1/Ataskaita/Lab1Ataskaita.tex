@@ -407,6 +407,62 @@ Viename grafike pavaizduokite tiesinį pagreitėjimą ir eksperimentų būdu nus
 \newpage
 \subsection{Parametų parinkimas}
 \subsection{PRS}
+\subsubsection{Pseudokodas}
 \subsection{Atstumų matricos skaičiavimas}
+\subsubsection{Pseudokodas}
 \subsection{Atstumų matricos ir PRS dalių lygiagretinimos rezultatai}
+Išlygiagretinus abi dalis gauname tokį grafiką:
+\begin{diagram}[ht]
+	\begin{center}
+		\begin{tikzpicture}[domain=0:3, scale=1]
+			\begin{axis}[
+					xlabel={Branduolių skaičius},
+					ylabel={Algoritmo efektyvumas},
+					legend style={at={(0.5,-0.2)},
+							anchor=north,legend cell align=left} ]
+				%x=y
+				\addplot[black, mark=none] table [x=x, y=y,] {
+						x y
+						1 1
+						2 2
+						4 4
+						8 8
+					};
+				%teorinis pagreitėjimas
+				\addplot[blue, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 0.950072522436182 0.950072522436182
+						4 2.11891857172997 2.11891857172997
+						8 4.17234651225025 4.17234651225025
+					};
+				% realus pagreitėjimas
+				\addplot[red, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 2.94398996385133 2.94398996385133
+						4 5.15688422319865 5.15688422319865
+						8 12.620180762777 12.620180762777
+					};
+					% realus pagreitėjimas
+				\addplot[purple, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 	1.71356091553439 1.71356091553439
+						4 3.45974021622667 3.45974021622667
+						8 7.45546543155825 7.45546543155825
+					};
+				\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas atstumų matrica, PRS, Visas algoritmas}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Efektyvumo diagrama, kai PRS ir matricos skaičiavimas lygiagretinami}
+	\label{dia:diagramaLygiagretinimas}
+\end{diagram}
 \end{document}
