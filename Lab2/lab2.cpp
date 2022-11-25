@@ -11,9 +11,9 @@ using namespace std;
 
 //===== Globalus kintamieji ===================================================
 
-int num_points = 12000;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
+int num_points = 8050;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 30000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 20000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 int threadId = 0;
 double **points;            // Masyvas taskams saugoti
@@ -31,12 +31,12 @@ double evaluate_solution(int*);                             // Funkcija sprendin
 //=============================================================================
 
 int main(int argc, char *argv[]) {
+    MPI_Init(&argc, &argv);
     int world_rank, world_size;
     int buff;
     MPI_Status stat;
     // srand(time(NULL));
 
-    MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     threadId = world_rank;
@@ -60,12 +60,16 @@ int main(int argc, char *argv[]) {
     if(world_rank == 0){
         for (int i=0; i<num_points; i=i+(world_size-1)) {
             for(int j=1;j<world_size;j++){
-                int temp = i + j - 1;
-                MPI_Send(&temp, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
+		if(i+j <=num_points){
+                	int temp = i + j - 1;
+                	 MPI_Send(&temp, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
+		}
             }
 
             for(int j=1;j<world_size;j++){
-                MPI_Recv(distance_matrix[i+j-1], i+1, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+		if(i+j <=num_points){
+                	MPI_Recv(distance_matrix[i+j-1], i+j, MPI_DOUBLE, j, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+		}
             }
         }
         for(int j=1;j<world_size;j++){
