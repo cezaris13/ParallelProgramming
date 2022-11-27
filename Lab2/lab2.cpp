@@ -11,9 +11,9 @@ using namespace std;
 
 //===== Globalus kintamieji ===================================================
 
-int num_points = 8050;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
+int num_points = 9000;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 20000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 13000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 int threadId = 0;
 double **points;            // Masyvas taskams saugoti
@@ -114,7 +114,11 @@ int main(int argc, char *argv[]) {
 	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
 
     MPI_Barrier(MPI_COMM_WORLD);
-    for (int i=0; i<num_iterations; i+=world_size) {
+    int it = 1;
+    int iterations = num_iterations/ world_size;
+    int remainder = num_iterations % world_size;
+    iterations += remainder > world_rank ? 1 : 0;
+    for (int i=0; i<iterations; i++) {
 		random_solution(solution);                  // Atsitiktinio sprendinio generavimas
 		f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
 		if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
@@ -139,6 +143,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
+	cout<<get_time()-t_2<< "<-time"<<endl; 
         printf("rankID %d\n",rankId);
         if(rankId != 0 && rankId != -1){
             MPI_Send(&buff, 1, MPI_INT, rankId, GET_BEST_SOLUTION, MPI_COMM_WORLD);
