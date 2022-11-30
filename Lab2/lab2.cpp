@@ -11,9 +11,9 @@ using namespace std;
 
 //===== Globalus kintamieji ===================================================
 
-int num_points = 12000;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
+int num_points = 9000;     // Tasku skaicius (max 50000). Didinant ilgeja matricos skaiciavimo ir sprendinio paieskos laikas
 int num_variables = 3;      // Tasku, kuriuos reikia rasti, skaicius
-int num_iterations = 30000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
+int num_iterations = 13000;  // Sprendinio paieskos algoritmo iteraciju skaicius (didinant - ilgeja sprendinio paieskos laikas)
 
 int threadId = 0;
 double **points;            // Masyvas taskams saugoti
@@ -31,12 +31,12 @@ double evaluate_solution(int*);                             // Funkcija sprendin
 //=============================================================================
 
 int main(int argc, char *argv[]) {
+    MPI_Init(&argc, &argv);
     int world_rank, world_size;
     int buff;
     MPI_Status stat;
     // srand(time(NULL));
 
-    MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     threadId = world_rank;
@@ -60,12 +60,16 @@ int main(int argc, char *argv[]) {
     if(world_rank == 0){
         for (int i=0; i<num_points; i=i+(world_size-1)) {
             for(int j=1;j<world_size;j++){
-                int temp = i + j - 1;
-                MPI_Send(&temp, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
+		if(i+j <=num_points){
+                	int temp = i + j - 1;
+                	 MPI_Send(&temp, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
+		}
             }
 
             for(int j=1;j<world_size;j++){
-                MPI_Recv(distance_matrix[i+j-1], i+1, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+		if(i+j <=num_points){
+                	MPI_Recv(distance_matrix[i+j-1], i+j, MPI_DOUBLE, j, MPI_ANY_TAG, MPI_COMM_WORLD,&stat);
+		}
             }
         }
         for(int j=1;j<world_size;j++){
@@ -110,7 +114,11 @@ int main(int argc, char *argv[]) {
 	double f_solution, f_best_solution = 1e10;     // Atsitiktinio ir geriausio rasto sprendiniu tikslo funkciju reiksmes
 
     MPI_Barrier(MPI_COMM_WORLD);
-    for (int i=0; i<num_iterations; i+=world_size) {
+    int it = 1;
+    int iterations = num_iterations/ world_size;
+    int remainder = num_iterations % world_size;
+    iterations += remainder > world_rank ? 1 : 0;
+    for (int i=0; i<iterations; i++) {
 		random_solution(solution);                  // Atsitiktinio sprendinio generavimas
 		f_solution = evaluate_solution(solution);   // Atsitiktinio sprendinio tikslo funkcijos skaiciavimas
 		if (f_solution < f_best_solution) {         // Tikrinam ar sugeneruotas sprendinys yra geresnis (mazesnis) uz geriausia zinoma
@@ -135,6 +143,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
+	cout<<get_time()-t_2<< "<-time"<<endl; 
         printf("rankID %d\n",rankId);
         if(rankId != 0 && rankId != -1){
             MPI_Send(&buff, 1, MPI_INT, rankId, GET_BEST_SOLUTION, MPI_COMM_WORLD);
