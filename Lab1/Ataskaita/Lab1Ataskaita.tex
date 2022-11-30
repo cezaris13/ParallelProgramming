@@ -205,7 +205,7 @@ Abu algoritmai buvo ištestuoti su 2, 4 ir 6 branduoliais ir rezultatai matomi \
 						x y
 						1 1
 						2 2
-						6 6 
+						6 6
 					};
 				% Teorinis pagreitejimas
 				\addplot[blue, mark=triangle*,
@@ -352,7 +352,7 @@ Pastebime, jog \textbf{Dynamic} yra kur kas efektyvesnis, lyginant su \textbf{St
 
 \newpage
 \subsection{Atstumų matricos ir PRS dalių lygiagretinimo rezultatai}
-Iš ankstesnių eksperimentų radome, jog \textbf{\ref{PRS1}} PRS algoritmas ir \textbf{Dynamic} direktyva atstumų matricai skaičiuoti buvo efektyviausi sprendimo būdai. 
+Iš ankstesnių eksperimentų radome, jog \textbf{\ref{PRS1}} PRS algoritmas ir \textbf{Dynamic} direktyva atstumų matricai skaičiuoti buvo efektyviausi sprendimo būdai.
 Eksperimentiniu būdu ištestavus progamą, buvo gauti tokie rezultatai:
 \begin{diagram}[ht]
 	\begin{center}
@@ -408,8 +408,104 @@ Viename grafike pavaizduokite tiesinį pagreitėjimą ir eksperimentų būdu nus
 \subsection{Parametų parinkimas}
 \subsection{PRS}
 \subsubsection{Pseudokodas}
+\begin{figure}[hbt!]
+	\begin{verbatim}
+    double f_solution, f_best_solution = 1e10;
+    int it = 1;
+    int iterations = num_iterations/ world_size;
+    int remainder = num_iterations % world_size;
+    iterations += remainder > world_rank ? 1 : 0;
+    for (int i=0; i<iterations; i++) {
+        // random find and evaluate solution
+        f_solution = evaluate_solution(solution);
+        if (f_solution < f_best_solution) { 
+            f_best_solution = f_solution;
+            if(f_best_solution == f_solution){
+               // copy solution values to the best_solution array
+            }
+        }
+    }
+    if(world_rank == 0){
+        // collect f_best_solution value for each thread, save best value and thread
+        int rankId = -1;
+        for(int j=1;j<world_size;j++){
+            double response;
+            MPI_Recv(&response, 1, MPI_DOUBLE, j, GET_BEST_SOLUTION_VALUE, MPI_COMM_WORLD, &stat);
+            if(response < f_best_solution) {
+                rankId = j;
+                f_best_solution = response;
+            }
+        }
+
+        if(rankId != 0 && rankId != -1){
+            // retrieve best solution from thread
+        }
+        for(int j=1;j<world_size;j++){
+            // stop worker threads
+        }
+    }
+    else {
+        do{
+            MPI_Recv(&buff, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
+            if(stat.MPI_TAG!=STOP_THREADS){
+                if(stat.MPI_TAG == GET_BEST_SOLUTION_VALUE) {
+                    // returns f_best_solution
+                }
+                if(stat.MPI_TAG == GET_BEST_SOLUTION){
+                    // returns best_solution
+                }
+            }
+        } while(stat.MPI_TAG!=STOP_THREADS);
+    }
+\end{verbatim}
+	\caption{PRS mpi pseudokodas}
+	\label {PRS2}
+\end{figure}
+\newpage
 \subsection{Atstumų matricos skaičiavimas}
 \subsubsection{Pseudokodas}
+\begin{figure}[hbt!]
+	\begin{verbatim}
+    distance_matrix = new double*[num_points];
+    if(world_rank == 0){
+        for (int i=0; i<num_points; i=i+(world_size-1)) {
+            for(int j=1;j<world_size;j++){ // send to all threads array item to calculate
+                if(i+j <=num_points){
+                    int temp = i + j - 1;
+                    MPI_Send(&temp, 1, MPI_INT, j, 0, MPI_COMM_WORLD);
+                }
+            }
+
+            for(int j=1;j<world_size;j++){ 
+                // receive calculated distance_matrix
+            }
+        }
+        for(int j=1;j<world_size;j++){// stop slave thread work
+            MPI_Send(&buff, 1, MPI_INT, j, STOP_THREADS, MPI_COMM_WORLD);
+        }
+    }
+    else{
+        do{
+            MPI_Recv(&buff, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &stat); 
+            //receive matrix, calculate,ant return
+            if(stat.MPI_TAG!=STOP_THREADS){
+                double *localDistances = new double[buff + 1];
+                localDistances ... = Haversine_distance(...)
+                MPI_Send(localDistances, buff + 1, MPI_DOUBLE, 0, stat.MPI_TAG, MPI_COMM_WORLD);
+            }
+        } while(stat.MPI_TAG!=STOP_THREADS);
+
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    //Broadcast to all threads
+\end{verbatim}
+	\caption{Atstumų matricos mpi pseudokodas}
+	\label {atstumų matricos pseudokodas}
+\end{figure}
+
+\newpage
 \subsection{Atstumų matricos ir PRS dalių lygiagretinimos rezultatai}
 Išlygiagretinus abi dalis gauname tokį grafiką:
 \begin{diagram}[ht]
@@ -448,7 +544,7 @@ Išlygiagretinus abi dalis gauname tokį grafiką:
 						4 5.15688422319865 5.15688422319865
 						8 12.620180762777 12.620180762777
 					};
-					% realus pagreitėjimas
+				% realus pagreitėjimas
 				\addplot[purple, mark=triangle*,
 					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
 					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
