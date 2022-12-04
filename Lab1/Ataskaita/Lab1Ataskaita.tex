@@ -405,8 +405,9 @@ Sudarytą bendros atminties lygiagretųjį algoritmą perdarykite į paskirstyto
 
 Viename grafike pavaizduokite tiesinį pagreitėjimą ir eksperimentų būdu nustatytą atstumų matricos skaičiavimo pagreitėjimo, sprendinio skaičiavimo pagreitėjimo, bei viso algoritmo (kai matricos skaičiavimas ir sprendinio paieška išlygiagretinti) pagreitėjimo priklausomybes nuo procesorių skaičiaus.
 \newpage
-\subsection{Parametų parinkimas}
 \subsection{PRS}
+\subsubsection{Aprašas}
+Kiekviena gija apskaičiuoja geriausią rezultatą kiekvienoje gijoje, tada 0-gija surenka visų giju rezultatus.
 \subsubsection{Pseudokodas}
 \begin{figure}[hbt!]
 	\begin{verbatim}
@@ -461,8 +462,15 @@ Viename grafike pavaizduokite tiesinį pagreitėjimą ir eksperimentų būdu nus
 	\caption{PRS mpi pseudokodas}
 	\label {PRS2}
 \end{figure}
+
 \newpage
 \subsection{Atstumų matricos skaičiavimas}
+\subsubsection{Aprašas}
+Algoritmo principas toks:
+\begin{enumerate}
+\item gija- vadovas skirsto matricą darbininkams, vėliau surenka apskaičiuotus rezultatus, praneša, kad darbininkai gali baigti darbą(dėl to efektyvumas = gijų skaičius - 1). 
+\item darbininkai gauna matricos eilutę, apskaičiuoja resultatą, gražina vadovui ir laukia, kada galės baigti savo darbą.
+\end{enumerate}
 \subsubsection{Pseudokodas}
 \begin{figure}[hbt!]
 	\begin{verbatim}
@@ -524,37 +532,37 @@ Išlygiagretinus abi dalis gauname tokį grafiką:
 						4 4
 						8 8
 					};
-				%teorinis pagreitėjimas
+				%Matricos  pagreitėjimas
 				\addplot[blue, mark=triangle*,
 					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
 					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 						x y label
 						1 1 1
-						2 0.950072522436182 0.950072522436182
-						4 2.11891857172997 2.11891857172997
-						8 4.17234651225025 4.17234651225025
+						2 1.01775456330592 1.01775456330592
+						4 2.25952942758542 2.25952942758542
+						8 4.22252430634291 4.22252430634291
 					};
-				% realus pagreitėjimas
+				% PRS pagreitėjimas
 				\addplot[red, mark=triangle*,
 					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
 					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 						x y label
 						1 1 1
-						2 2.94398996385133 2.94398996385133
-						4 5.15688422319865 5.15688422319865
-						8 12.620180762777 12.620180762777
+						2 1.88155803083376 1.88155803083376
+						4 3.65909898281 3.65909898281
+						8 7.3421580726395 7.3421580726395
 					};
-				% realus pagreitėjimas
+				% total
 				\addplot[purple, mark=triangle*,
 					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
 					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
 						x y label
 						1 1 1
-						2 	1.71356091553439 1.71356091553439
-						4 3.45974021622667 3.45974021622667
-						8 7.45546543155825 7.45546543155825
+						2 	1.45183579993834 1.45183579993834
+						4 3.00813425724229 3.00813425724229
+						8 5.83292774333023 5.83292774333023
 					};
-				\legend {x=y,Teorinis pagreitėjimas,Realus pagreitėjimas atstumų matrica, PRS, Visas algoritmas}
+				\legend {x=y,Matricos realus pagreitėjimas,PRS pagreitėjimas, Viso algoritmo pagreitėjimas}
 			\end{axis}
 		\end{tikzpicture}
 	\end{center}
