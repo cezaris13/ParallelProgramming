@@ -569,4 +569,139 @@ Išlygiagretinus abi dalis gauname tokį grafiką:
 	\caption{Efektyvumo diagrama, kai PRS ir matricos skaičiavimas lygiagretinami}
 	\label{dia:diagramaLygiagretinimas}
 \end{diagram}
+\newpage
+\section {3 laboratorinis darbas}
+\subsection{Aprašymas}
+\subsubsection{Užduotis}
+Sudarytą paskirstytos atminties lygiagretųjį algoritmą paleiskite (MIF superkompiuteryje) ir atlikite skaičiavimus naudodami 2, 4 ir 8 arba daugiau procesorių.
+
+Viename grafike pavaizduokite tiesinį pagreitėjimą ir eksperimentų būdu nustatytą atstumų matricos skaičiavimo pagreitėjimo, sprendinio skaičiavimo pagreitėjimo, bei viso algoritmo (kai matricos skaičiavimas ir sprendinio paieška išlygiagretinti) pagreitėjimo priklausomybes nuo procesorių skaičiaus.
+\newpage
+\begin{diagram}[ht]
+	\begin{center}
+		\begin{tikzpicture}[domain=0:3, scale=1.5]
+			\begin{axis}[
+					xlabel={Branduolių skaičius},
+					ylabel={Algoritmo efektyvumas},
+					legend style={at={(0.5,-0.2)},
+							anchor=north,legend cell align=left} ]
+				%x=y
+				\addplot[black, mark=none] table [x=x, y=y,] {
+						x y
+						1 1
+						2 2
+						4 4
+						8 8
+						16 16
+						32 32
+						64 64
+					};
+				%Matricos  pagreitėjimas
+				\addplot[blue, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 0.913412979652526 0.913412979652526
+						4 2.06791699512909 2.06791699512909
+						8 2.97206997607846 2.97206997607846
+						16 4.59570760063371 4.59570760063371
+						32 4.87987625223182 4.87987625223182
+						64 4.67179822092752 4.67179822092752
+					};
+				% PRS pagreitėjimas
+				\addplot[red, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.95646741548835 1.95646741548835
+						4 3.73598972103272 3.73598972103272
+						8 6.45690863071238 6.45690863071238
+						16 11.430633311221 11.430633311221
+						32 16.324170626133 16.324170626133
+						64 19.3207934293739 19.3207934293739
+					};
+				% total
+				\addplot[purple, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.40296892943248 1.40296892943248
+						4 2.92105063357079 2.92105063357079
+						8 4.59271092791021 4.59271092791021
+						16 7.54268369669204 7.54268369669204
+						32 9.0037757691543 9.0037757691543
+						64 9.25093080784449 9.25093080784449
+					};
+				\legend {x=y,Matricos realus pagreitėjimas,PRS pagreitėjimas, Viso algoritmo pagreitėjimas}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Efektyvumo diagrama, kai PRS ir matricos skaičiavimas lygiagretinami (leista ant MIF superkompiuterio)}
+	\label{dia:diagramaLygiagretinimas}
+\end{diagram}
+
+\begin{diagram}[ht]
+	\begin{center}
+		\begin{tikzpicture}[domain=0:3, scale=1]
+			\begin{axis}[
+					xlabel={Branduolių skaičius},
+					ylabel={Algoritmo efektyvumas},
+					legend style={at={(0.5,-0.2)},
+							anchor=north,legend cell align=left} ]
+				%x=y
+				\addplot[black, mark=none] table [x=x, y=y,] {
+						x y
+						1 1
+						2 2
+						4 4
+						8 8
+						16 16
+					};
+				%Matricos  pagreitėjimas
+				\addplot[blue, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 0.913412979652526 0.913412979652526
+						4 2.06791699512909 2.06791699512909
+						8 2.97206997607846 2.97206997607846
+						16 4.59570760063371 4.59570760063371
+					};
+				% PRS pagreitėjimas
+				\addplot[red, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.95646741548835 1.95646741548835
+						4 3.73598972103272 3.73598972103272
+						8 6.45690863071238 6.45690863071238
+						16 11.430633311221 11.430633311221
+					};
+				% total
+				\addplot[purple, mark=triangle*,
+					nodes near coords={\pgfmathprintnumber[fixed zerofill, precision=3]{\pgfplotspointmeta}},
+					visualization depends on=\thisrow{label} \as \Label] table [x=x, y=y] {
+						x y label
+						1 1 1
+						2 1.40296892943248 1.40296892943248
+						4 2.92105063357079 2.92105063357079
+						8 4.59271092791021 4.59271092791021
+						16 7.54268369669204 7.54268369669204
+					};
+				\legend {x=y,Matricos realus pagreitėjimas,PRS pagreitėjimas, Viso algoritmo pagreitėjimas}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Efektyvumo diagrama, kai PRS ir matricos skaičiavimas lygiagretinami iki 16 branduolių (leista ant MIF superkompiuterio)}
+	\label{dia:diagramaLygiagretinimas}
+\end{diagram}
+
+
+
+
 \end{document}
