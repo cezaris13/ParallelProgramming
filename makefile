@@ -1,9 +1,0 @@
-build:
-	#g++ 1task.cpp -o output
-	g++ -fopenmp Lecture5.cpp -o output
-run:
-	#g++ 1task.cpp -o output
-	g++ -fopenmp Lecture5.cpp -o output
-	./output
-	./output
-	./output
