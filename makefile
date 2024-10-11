@@ -1,9 +1,3 @@
-##
-# Project Title
-#
-# @file
-# @version 0.1
-
 build:
 	#g++ 1task.cpp -o output
 	g++ -fopenmp Lecture5.cpp -o output
@@ -13,4 +7,3 @@ run:
 	./output
 	./output
 	./output
-# end
