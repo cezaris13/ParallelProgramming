@@ -16,6 +16,9 @@ The file `lab_01_2_algorithm.cpp` contains a program that finds a set $X$ of giv
 
 At the start of the algorithm, a distance matrix is created, which stores the distances in kilometres between the points, calculated according to the Haversine formula. Given that the distance from point $a$ to point $b$ is equal to the distance from point $b$ to point $a$, only half of the matrix is filled. The distances stored in this matrix are used to search for points in the set $X$.
 
+
+The lab report can be found [here](/Labs/LabReport/LabReport.pdf)
+
 ### 1 Task
 1. Choose the size of the dataset and the number of iterations of the algorithm so that the calculation of the distance matrix takes at least 10 seconds and the time to find the solution is at least 20 seconds.
 2. Consider data loading and distance matrix computation as the sequential part of the algorithm and solution search as the parallel part. Evaluate the theoretical possible speed-ups of the algorithm using 2 and 4 processors and the maximum possible speed-up.

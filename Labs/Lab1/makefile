@@ -14,7 +14,7 @@ rundebug:
 	done
 	./check_if_deterministic.sh
 
-runbenchmark:
+runBenchmark:
 	g++-12 -fopenmp ${mainFile} -o ${output}
 	for ((i=1; i <= 3; ++i)) do \
 		./${output}; \
