@@ -1,4 +1,7 @@
-### Introduction
+# Parallel programming laboratory assignments which were done in Vilnius university 2022 Autumn semester.
+The repository constists of the laboratory work (described below) and some additional tasks to learn openMP and MPI for c++. Could not find the description of the practice tasks. 
+
+### Introduction of laboratory work
 
 The set $A$ consists of geographic points with latitude and longitude coordinates. From this set, a set of points $X$ must be chosen such that the sum of the distances from each point in $A$ to its nearest point in $X$ is minimal, where $X \subset A$.
 

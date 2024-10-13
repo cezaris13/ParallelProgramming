@@ -1,31 +1,21 @@
-##
-# Project Title
-#
-# @file
-# @version 0.1
+mainFile = lab1.cpp
+output = lab1.o
+resultsFile = responses.txt
 
 build:
-	g++ -fopenmp lab1.cpp -o output
+	g++ -fopenmp ${mainFile} -o ${output}
 run:
-	g++ -fopenmp lab1.cpp -o output
+	g++ -fopenmp ${mainFile} -o ${output}
 	./output
 rundebug:
-	g++ -fopenmp lab1.cpp -o output
-# 	g++  lab1.cpp -o output
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
-	./output >> responses.txt
+	g++ -fopenmp ${mainFile} -o ${output}
+	for ((i=1; i <= 9; ++i)) do \
+		./${output} >> ${resultsFile}; \
+	done
 	./check_if_deterministic.sh
+
 runbenchmark:
-	g++-12 -fopenmp lab1.cpp -o output
-# 	g++-12  lab1.cpp -o output
-	./output
-	./output 
-	./output 
-# end
+	g++-12 -fopenmp ${mainFile} -o ${output}
+	for ((i=1; i <= 3; ++i)) do \
+		./${output}; \
+	done
